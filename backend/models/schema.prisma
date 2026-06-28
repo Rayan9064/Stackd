@@ -1,0 +1,51 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  url         String   @unique
+  summary     String
+  source      String
+  publishedAt DateTime
+  tags String
+  createdAt   DateTime @default(now())
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  title       String
+  company     String
+  location    String
+  equity      String?
+  salaryRange String?
+  url         String   @unique
+  source      String
+  postedAt    DateTime
+  role        String   // engineering, product, design, marketing, etc.
+  stage       String?  // seed, series-a, etc.
+}
+
+model Launch {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  url         String   @unique
+  source      String   // ph, hn
+  upvotes     Int      @default(0)
+  launchedAt  DateTime
+}
+
+model DigestSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  active    Boolean  @default(true)
+}

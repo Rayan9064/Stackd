@@ -1,0 +1,125 @@
+{
+  "comment": "Community maintained — submit a PR to add or update entries",
+  "startups": [
+    {
+      "id": "zepto",
+      "name": "Zepto",
+      "sector": "E-Commerce",
+      "stage": "Growth",
+      "location": "Bangalore",
+      "oneLiner": "10-minute grocery delivery service in India.",
+      "fundingTotal": "$1.2B",
+      "website": "https://www.zepto.com"
+    },
+    {
+      "id": "razorpay",
+      "name": "Razorpay",
+      "sector": "Fintech",
+      "stage": "Growth",
+      "location": "Bangalore",
+      "oneLiner": "The leading payments provider for businesses in India.",
+      "fundingTotal": "$740M",
+      "website": "https://razorpay.com"
+    },
+    {
+      "id": "decentro",
+      "name": "Decentro",
+      "sector": "Fintech",
+      "stage": "Seed",
+      "location": "Bangalore",
+      "oneLiner": "API banking and fintech infrastructure platform.",
+      "fundingTotal": "$5.7M",
+      "website": "https://decentro.tech"
+    },
+    {
+      "id": "invideo",
+      "name": "InVideo",
+      "sector": "SaaS",
+      "stage": "Series A",
+      "location": "Mumbai",
+      "oneLiner": "AI-powered online video creation platform.",
+      "fundingTotal": "$52M",
+      "website": "https://invideo.io"
+    },
+    {
+      "id": "meesho",
+      "name": "Meesho",
+      "sector": "E-Commerce",
+      "stage": "Growth",
+      "location": "Bangalore",
+      "oneLiner": "Social commerce platform connecting sellers with customers.",
+      "fundingTotal": "$1.1B",
+      "website": "https://www.meesho.com"
+    },
+    {
+      "id": "ather-energy",
+      "name": "Ather Energy",
+      "sector": "Clean Tech",
+      "stage": "Growth",
+      "location": "Bangalore",
+      "oneLiner": "Design and manufacture of high-performance electric vehicles.",
+      "fundingTotal": "$450M",
+      "website": "https://www.atherenergy.com"
+    },
+    {
+      "id": "cred",
+      "name": "Cred",
+      "sector": "Fintech",
+      "stage": "Growth",
+      "location": "Bangalore",
+      "oneLiner": "Members-only credit card bill payment platform with rewards.",
+      "fundingTotal": "$800M",
+      "website": "https://cred.club"
+    },
+    {
+      "id": "darwinbox",
+      "name": "Darwinbox",
+      "sector": "SaaS",
+      "stage": "Growth",
+      "location": "Hyderabad",
+      "oneLiner": "Cloud-based HRMS platform for enterprise companies.",
+      "fundingTotal": "$115M",
+      "website": "https://darwinbox.com"
+    },
+    {
+      "id": "browserstack",
+      "name": "BrowserStack",
+      "sector": "SaaS",
+      "stage": "Growth",
+      "location": "Mumbai",
+      "oneLiner": "The leading mobile and web testing platform on the cloud.",
+      "fundingTotal": "$250M",
+      "website": "https://www.browserstack.com"
+    },
+    {
+      "id": "yellow-ai",
+      "name": "Yellow.ai",
+      "sector": "SaaS",
+      "stage": "Series C",
+      "location": "Bangalore",
+      "oneLiner": "Conversational AI platform for enterprise customer experience.",
+      "fundingTotal": "$102M",
+      "website": "https://yellow.ai"
+    },
+    {
+      "id": "kuku-fm",
+      "name": "Kuku FM",
+      "sector": "Consumer",
+      "stage": "Series C",
+      "location": "Mumbai",
+      "oneLiner": "Audio platform hosting audiobooks, stories, and podcasts in regional languages.",
+      "fundingTotal": "$47M",
+      "website": "https://kukufm.com"
+    },
+    {
+      "id": "dharaksha-eclc",
+      "name": "Dharaksha Ecosolutions",
+      "sector": "Clean Tech",
+      "stage": "Seed",
+      "location": "New Delhi",
+      "oneLiner": "Creating biodegradable packaging material from crop stubble to replace thermocol.",
+      "fundingTotal": "$500K",
+      "website": "https://dharaksha.com"
+    }
+  ]
+}

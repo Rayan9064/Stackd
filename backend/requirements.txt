@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+prisma
+feedparser
+apscheduler
+resend
+beautifulsoup4
+httpx
+jinja2
+pydantic[email]
+pytest

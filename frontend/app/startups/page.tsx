@@ -1,0 +1,100 @@
+import React from 'react';
+import { api } from '@/lib/api';
+import StartupCard from '@/components/StartupCard';
+import StartupsClient from './StartupsClient';
+import { Plus } from 'lucide-react';
+
+// Revalidate this page every hour (ISR)
+export const revalidate = 3600;
+
+interface PageProps {
+  searchParams: Promise<{
+    sector?: string;
+    stage?: string;
+    search?: string;
+    page?: string;
+  }>;
+}
+
+export default async function StartupsPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+  const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
+  const sector = resolvedParams.sector || '';
+  const stage = resolvedParams.stage || '';
+  const search = resolvedParams.search || '';
+  const limit = 12;
+
+  // Fetch startups from backend API
+  const startupsRes = await api.getStartups({
+    page,
+    limit,
+    sector,
+    stage,
+    search
+  });
+
+  const startups = startupsRes?.data || [];
+  const totalItems = startupsRes?.total || 0;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Startup Directory
+          </h1>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Active high-growth tech startups operating out of India.
+          </p>
+        </div>
+
+        <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:underline border border-zinc-200 dark:border-zinc-800 rounded-md px-3 py-1.5 bg-white dark:bg-zinc-950 font-semibold"
+        >
+          <Plus size={14} /> Submit Profile
+        </a>
+      </div>
+
+      {/* Filter and Search Bar (Client component) */}
+      <StartupsClient currentPage={page} totalPages={totalPages} />
+
+      {/* Startups Grid */}
+      {startups.length === 0 ? (
+        <div className="text-center py-12 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No startups match your search criteria.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {startups.map((startup) => (
+            <StartupCard key={startup.id} startup={startup} />
+          ))}
+        </div>
+      )}
+
+      {/* Submit PR notice */}
+      <div className="bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-850 rounded-lg p-5 text-center max-w-xl mx-auto mt-12 space-y-2">
+        <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+          Want your startup listed?
+        </h3>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+          Submit a Pull Request to add your startup to the directory. Follow the schema in the repo and link back to your official website.
+        </p>
+        <div className="pt-2">
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline inline-flex items-center gap-0.5"
+          >
+            Submit a PR on GitHub →
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
