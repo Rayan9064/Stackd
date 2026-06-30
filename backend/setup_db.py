@@ -81,6 +81,12 @@ def setup_database():
     if gen_res.returncode != 0:
         print("Error: prisma generate failed.", file=sys.stderr)
         sys.exit(gen_res.returncode)
+
+    # Render/Linux deploys need the Prisma query engine binary available at runtime.
+    fetch_res = subprocess.run([*prisma_cmd, "py", "fetch"])
+    if fetch_res.returncode != 0:
+        print("Error: prisma py fetch failed.", file=sys.stderr)
+        sys.exit(fetch_res.returncode)
         
     print("Database setup completed successfully!")
 
