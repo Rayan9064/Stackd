@@ -11,7 +11,6 @@ logger = logging.getLogger("db")
 async def ensure_db_connected():
     if not db.is_connected():
         await db.connect()
-        return
 
     try:
         await db.query_raw("SELECT 1")
@@ -22,6 +21,7 @@ async def ensure_db_connected():
         except Exception:
             pass
         await db.connect()
+        await db.query_raw("SELECT 1")
 
 
 async def db_status():

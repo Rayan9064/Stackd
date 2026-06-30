@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 import resend
 from jinja2 import Template
-from backend.db import db
+from backend.db import db, ensure_db_connected
 
 # Import fetchers
 from backend.fetchers.news_fetcher import scrape_rss
@@ -112,8 +112,7 @@ EMAIL_TEMPLATE = """
 async def send_weekly_digest():
     logger.info("Starting weekly digest compile and dispatch...")
     
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
         
     resend_api_key = os.environ.get("RESEND_API_KEY")
     from_email = os.environ.get("RESEND_FROM_EMAIL", "digest@example.com")

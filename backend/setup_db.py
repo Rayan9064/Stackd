@@ -16,8 +16,13 @@ def load_env():
                     if len(parts) == 2:
                         key = parts[0].strip()
                         val = parts[1].strip().strip('"').strip("'")
-                        os.environ[key] = val
+                        os.environ.setdefault(key, val)
     os.environ.setdefault("DATABASE_URL", "file:./dev.db")
+
+
+def mask_database_url(db_url):
+    return re.sub(r"://([^:/@]+):([^@]+)@", r"://\1:***@", db_url)
+
 
 def setup_database():
     load_env()
@@ -36,7 +41,7 @@ def setup_database():
         print("Please create a .env file or set DATABASE_URL.", file=sys.stderr)
         sys.exit(1)
         
-    print(f"DATABASE_URL is: {db_url}")
+    print(f"DATABASE_URL is: {mask_database_url(db_url)}")
     
     schema_path = os.path.join(os.path.dirname(__file__), 'models', 'schema.prisma')
     if not os.path.exists(schema_path):

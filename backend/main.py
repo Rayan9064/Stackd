@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Database and Scheduler
-from backend.db import db, db_status
+from backend.db import db, db_status, ensure_db_connected
 from backend.scheduler import scheduler, setup_scheduler
 
 # Routers
@@ -40,7 +40,7 @@ async def lifespan(app: FastAPI):
     
     # 1. Connect database
     try:
-        await db.connect()
+        await ensure_db_connected()
         logger.info("Database connected successfully.")
     except Exception as e:
         logger.error(f"Failed to connect database at startup: {e}")
