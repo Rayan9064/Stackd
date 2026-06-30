@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import subprocess
+import site
 
 def load_env():
     # Load .env manually if it exists to avoid dependency issues before pip install
@@ -16,13 +17,18 @@ def load_env():
                         key = parts[0].strip()
                         val = parts[1].strip().strip('"').strip("'")
                         os.environ[key] = val
+    os.environ.setdefault("DATABASE_URL", "file:./dev.db")
 
 def setup_database():
     load_env()
     
     # Add virtual environment Scripts folder to PATH so prisma can find prisma-client-py
-    scripts_dir = os.path.dirname(sys.executable)
-    os.environ["PATH"] = scripts_dir + os.pathsep + os.environ.get("PATH", "")
+    scripts_dirs = [os.path.dirname(sys.executable)]
+    user_base = site.getuserbase()
+    if user_base:
+        scripts_dirs.append(os.path.join(user_base, f"Python{sys.version_info.major}{sys.version_info.minor}", "Scripts"))
+        scripts_dirs.append(os.path.join(user_base, "Scripts"))
+    os.environ["PATH"] = os.pathsep.join(scripts_dirs) + os.pathsep + os.environ.get("PATH", "")
     
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
@@ -48,34 +54,30 @@ def setup_database():
         content = re.sub(r'provider\s*=\s*"postgresql"', 'provider = "sqlite"', content)
         # SQLite does not support scalar lists (String[]), replace it with String
         content = re.sub(r'tags\s*String\[\]', 'tags String', content)
+        content = re.sub(r'topics\s*String\[\]', 'topics String', content)
     else:
         print("Configuring Prisma schema for PostgreSQL...")
         content = re.sub(r'provider\s*=\s*"sqlite"', 'provider = "postgresql"', content)
         # Restore String[] for PostgreSQL
         content = re.sub(r'tags\s*String(?!\s*@|\[\])', 'tags String[]', content)
+        content = re.sub(r'topics\s*String(?!\s*@|\[\])', 'topics String[]', content)
         
     with open(schema_path, 'w', encoding='utf-8') as f:
         f.write(content)
         
     print("Prisma schema updated. Running prisma db push and generate...")
     
-    # Locate local virtualenv prisma binary
-    prisma_bin = os.path.join(os.path.dirname(sys.executable), "prisma")
-    if os.name == "nt":
-        prisma_bin += ".exe"
-    if not os.path.exists(prisma_bin):
-        prisma_bin = "prisma" # fallback
-        
-    print(f"Using prisma binary: {prisma_bin}")
+    prisma_cmd = [sys.executable, "-m", "prisma"]
+    print(f"Using prisma command: {' '.join(prisma_cmd)}")
     
     # Run prisma db push
-    push_res = subprocess.run([prisma_bin, "db", "push", f"--schema={schema_path}"])
+    push_res = subprocess.run([*prisma_cmd, "db", "push", f"--schema={schema_path}"])
     if push_res.returncode != 0:
         print("Error: prisma db push failed.", file=sys.stderr)
         sys.exit(push_res.returncode)
         
     # Run prisma generate
-    gen_res = subprocess.run([prisma_bin, "generate", f"--schema={schema_path}"])
+    gen_res = subprocess.run([*prisma_cmd, "generate", f"--schema={schema_path}"])
     if gen_res.returncode != 0:
         print("Error: prisma generate failed.", file=sys.stderr)
         sys.exit(gen_res.returncode)

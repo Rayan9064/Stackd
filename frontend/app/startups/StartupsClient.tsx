@@ -17,6 +17,7 @@ export default function StartupsClient({ currentPage, totalPages }: StartupsClie
   const currentSearch = searchParams.get('search') || '';
   const currentSector = searchParams.get('sector') || '';
   const currentStage = searchParams.get('stage') || '';
+  const currentGeography = searchParams.get('geography') || '';
 
   const updateUrl = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -49,6 +50,10 @@ export default function StartupsClient({ currentPage, totalPages }: StartupsClie
     updateUrl({ stage: val });
   };
 
+  const handleGeography = (val: string) => {
+    updateUrl({ geography: val });
+  };
+
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
@@ -79,6 +84,21 @@ export default function StartupsClient({ currentPage, totalPages }: StartupsClie
         { label: 'Series A', value: 'series a' },
         { label: 'Series C', value: 'series c' },
         { label: 'Growth', value: 'growth' }
+      ]
+    },
+    {
+      name: 'Geography',
+      placeholder: 'Select Region',
+      value: currentGeography,
+      onChange: handleGeography,
+      options: [
+        { label: 'Americas / US', value: 'US' },
+        { label: 'Europe', value: 'EU' },
+        { label: 'Southeast Asia', value: 'SEA' },
+        { label: 'India', value: 'INDIA' },
+        { label: 'Latin America', value: 'LATAM' },
+        { label: 'Africa', value: 'AFRICA' },
+        { label: 'Global', value: 'GLOBAL' }
       ]
     }
   ];

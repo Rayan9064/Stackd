@@ -9,6 +9,7 @@ async def get_news(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
     source: Optional[str] = Query(None),
+    geography: Optional[str] = Query(None),
     search: Optional[str] = Query(None)
 ):
     if not db.is_connected():
@@ -23,6 +24,15 @@ async def get_news(
             where["source"] = sources[0]
         else:
             where["source"] = {"in": sources}
+            
+    if geography:
+        geographies = [g.strip().upper() for g in geography.split(",") if g.strip()]
+        # Capitalize and clean inputs (e.g. SEA, EU, US, INDIA, GLOBAL)
+        # Note: map inputs like "Americas" or "US" to database representations
+        if len(geographies) == 1:
+            where["geography"] = geographies[0]
+        else:
+            where["geography"] = {"in": geographies}
             
     if search:
         search_lower = search.strip()
@@ -41,7 +51,6 @@ async def get_news(
         take=limit
     )
     
-    # Format and convert schema for articles to return sourceUrl
     data = []
     for art in articles:
         # SQLite tags might be stored as comma-separated string, parse if needed
@@ -53,9 +62,10 @@ async def get_news(
             "id": art.id,
             "title": art.title,
             "url": art.url,
-            "sourceUrl": art.url,  # link back to original content
+            "sourceUrl": art.sourceUrl or art.url,  # link back to original content
             "summary": art.summary,
             "source": art.source,
+            "geography": art.geography or "Global",
             "publishedAt": art.publishedAt,
             "tags": tags,
             "createdAt": art.createdAt
@@ -65,5 +75,6 @@ async def get_news(
         "data": data,
         "total": total,
         "page": page,
-        "limit": limit
+        "limit": limit,
+        "hasMore": offset + len(data) < total
     }

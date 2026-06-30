@@ -11,6 +11,7 @@ interface PageProps {
   searchParams: Promise<{
     sector?: string;
     stage?: string;
+    geography?: string;
     search?: string;
     page?: string;
   }>;
@@ -21,6 +22,7 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
   const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
   const sector = resolvedParams.sector || '';
   const stage = resolvedParams.stage || '';
+  const geography = resolvedParams.geography || '';
   const search = resolvedParams.search || '';
   const limit = 12;
 
@@ -30,6 +32,7 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
     limit,
     sector,
     stage,
+    geography,
     search
   });
 
@@ -40,13 +43,13 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-6 font-heading">
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Indian Investor Directory
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
+            Global Investor Directory
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            A community-maintained index of active VCs and angels investing in the Indian ecosystem.
+            A community-maintained index of active VCs and angels investing in global ecosystems.
           </p>
         </div>
 
@@ -82,7 +85,7 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
           Are you an investor?
         </h3>
         <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-          Help us keep this list up to date. If you represent an active fund or invest as an angel in India, submit a Pull Request to add or modify your profile.
+          Help us keep this list up to date. If you represent an active fund or invest as an angel, submit a Pull Request to add or modify your profile.
         </p>
         <div className="pt-2">
           <a

@@ -3,8 +3,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Cohort } from '@/lib/api';
 import SourceBadge from './SourceBadge';
+import GeoBadge from './GeoBadge';
 import { getDaysRemaining } from '@/lib/utils';
-import { Calendar, DollarSign, Globe2, ArrowUpRight } from 'lucide-react';
+import { Calendar, DollarSign, Percent, ArrowUpRight } from 'lucide-react';
 
 interface CohortCardProps {
   cohort: Cohort;
@@ -49,9 +50,14 @@ export default function CohortCard({ cohort }: CohortCardProps) {
     <Card className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col justify-between h-full hover:border-zinc-400 dark:hover:border-zinc-650 transition-colors">
       <CardHeader className="p-4 pb-2">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-            {cohort.name}
-          </CardTitle>
+          <div className="space-y-1">
+            <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+              {cohort.name}
+            </CardTitle>
+            <div className="flex items-center gap-1.5 mt-1">
+              <GeoBadge geo={cohort.geography} />
+            </div>
+          </div>
           {getDeadlineBadge()}
         </div>
       </CardHeader>
@@ -60,18 +66,18 @@ export default function CohortCard({ cohort }: CohortCardProps) {
         {/* Cohort Details */}
         <div className="grid grid-cols-2 gap-2 text-xs text-zinc-500 dark:text-zinc-400">
           <div className="flex items-center gap-1.5">
-            <Globe2 size={13} className="text-zinc-400" />
-            <span className="truncate">{cohort.geography}</span>
+            <DollarSign size={13} className="text-zinc-400" />
+            <span className="truncate">{cohort.investment || 'Stipend'}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <DollarSign size={13} className="text-zinc-400" />
-            <span className="truncate">{cohort.investmentAmount}</span>
+            <Percent size={13} className="text-zinc-400" />
+            <span className="truncate">{cohort.equity || '0%'} Equity</span>
           </div>
         </div>
         
         {/* Sectors Tags */}
         <div className="flex flex-wrap gap-1 pt-1">
-          {cohort.sectors.map((sector, i) => (
+          {cohort.sectors && cohort.sectors.map((sector, i) => (
             <Badge
               key={i}
               variant="secondary"
@@ -86,10 +92,10 @@ export default function CohortCard({ cohort }: CohortCardProps) {
       <CardFooter className="p-4 pt-3 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
         <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
           <Calendar size={12} />
-          <span>Deadline: {new Date(cohort.deadline).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span>Deadline: {new Date(cohort.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
         </div>
         <div className="flex items-center gap-2">
-          <SourceBadge source="Accelerator" url={cohort.applyUrl} />
+          <SourceBadge source="Accelerator" url={cohort.sourceUrl || cohort.applyUrl} />
           <a
             href={cohort.applyUrl}
             target="_blank"

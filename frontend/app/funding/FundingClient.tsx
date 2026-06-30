@@ -5,20 +5,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import FilterBar from '@/components/FilterBar';
 import { Button } from '@/components/ui/button';
 
-interface JobsClientProps {
+interface FundingClientProps {
   currentPage: number;
   totalPages: number;
 }
 
-export default function JobsClient({ currentPage, totalPages }: JobsClientProps) {
+export default function FundingClient({ currentPage, totalPages }: FundingClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const currentSearch = searchParams.get('search') || '';
-  const currentRole = searchParams.get('role') || '';
-  const currentLocation = searchParams.get('location') || '';
   const currentStage = searchParams.get('stage') || '';
-  const currentRemote = searchParams.get('remote') || '';
   const currentGeography = searchParams.get('geography') || '';
 
   const updateUrl = (newParams: Record<string, string | null>) => {
@@ -37,27 +34,15 @@ export default function JobsClient({ currentPage, totalPages }: JobsClientProps)
       params.delete('page');
     }
     
-    router.push(`/jobs?${params.toString()}`);
+    router.push(`/funding?${params.toString()}`);
   };
 
   const handleSearch = (val: string) => {
     updateUrl({ search: val });
   };
 
-  const handleRole = (val: string) => {
-    updateUrl({ role: val });
-  };
-
-  const handleLocation = (val: string) => {
-    updateUrl({ location: val });
-  };
-
   const handleStage = (val: string) => {
     updateUrl({ stage: val });
-  };
-
-  const handleRemote = (val: string) => {
-    updateUrl({ remote: val });
   };
 
   const handleGeography = (val: string) => {
@@ -67,30 +52,21 @@ export default function JobsClient({ currentPage, totalPages }: JobsClientProps)
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
-    router.push(`/jobs?${params.toString()}`);
+    router.push(`/funding?${params.toString()}`);
   };
 
   const filters = [
     {
-      name: 'Role',
-      placeholder: 'Select Role',
-      value: currentRole,
-      onChange: handleRole,
+      name: 'Round',
+      placeholder: 'Select Round',
+      value: currentStage,
+      onChange: handleStage,
       options: [
-        { label: 'Engineering', value: 'engineering' },
-        { label: 'Product', value: 'product' },
-        { label: 'Design', value: 'design' },
-        { label: 'Marketing', value: 'marketing' }
-      ]
-    },
-    {
-      name: 'Workplace',
-      placeholder: 'Remote/Onsite',
-      value: currentRemote,
-      onChange: handleRemote,
-      options: [
-        { label: 'Remote Only', value: 'true' },
-        { label: 'Onsite / Hybrid', value: 'false' }
+        { label: 'Pre-Seed', value: 'pre-seed' },
+        { label: 'Seed', value: 'seed' },
+        { label: 'Series A', value: 'series a' },
+        { label: 'Series B', value: 'series b' },
+        { label: 'Growth', value: 'growth' }
       ]
     },
     {
@@ -107,30 +83,6 @@ export default function JobsClient({ currentPage, totalPages }: JobsClientProps)
         { label: 'Africa', value: 'AFRICA' },
         { label: 'Global', value: 'GLOBAL' }
       ]
-    },
-    {
-      name: 'Location',
-      placeholder: 'Select City',
-      value: currentLocation,
-      onChange: handleLocation,
-      options: [
-        { label: 'San Francisco', value: 'San Francisco' },
-        { label: 'London', value: 'London' },
-        { label: 'Singapore', value: 'Singapore' },
-        { label: 'Bangalore', value: 'Bangalore' }
-      ]
-    },
-    {
-      name: 'Stage',
-      placeholder: 'Select Stage',
-      value: currentStage,
-      onChange: handleStage,
-      options: [
-        { label: 'Seed', value: 'seed' },
-        { label: 'Series A', value: 'series-a' },
-        { label: 'Series B', value: 'series-b' },
-        { label: 'Growth', value: 'growth' }
-      ]
     }
   ];
 
@@ -139,7 +91,7 @@ export default function JobsClient({ currentPage, totalPages }: JobsClientProps)
       <FilterBar
         searchVal={currentSearch}
         onSearchChange={handleSearch}
-        searchPlaceholder="Search jobs or companies..."
+        searchPlaceholder="Search funding news (e.g. company, VC)..."
         filters={filters}
       />
       

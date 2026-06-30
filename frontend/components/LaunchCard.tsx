@@ -11,6 +11,19 @@ interface LaunchCardProps {
 }
 
 export default function LaunchCard({ launch }: LaunchCardProps) {
+  const getLaunchLabel = (source: string) => {
+    switch (source.toLowerCase()) {
+      case 'ph':
+        return 'Product Hunt';
+      case 'hn':
+        return 'Hacker News';
+      case 'github':
+        return 'GitHub Repository';
+      default:
+        return 'View Launch';
+    }
+  };
+
   return (
     <Card className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col justify-between h-full hover:border-zinc-400 dark:hover:border-zinc-650 transition-colors">
       <CardHeader className="p-4 pb-2">
@@ -31,7 +44,7 @@ export default function LaunchCard({ launch }: LaunchCardProps) {
       
       <CardContent className="p-4 pt-1 pb-3 flex-grow">
         <p className="text-zinc-600 dark:text-zinc-400 text-sm line-clamp-2 leading-relaxed">
-          {launch.description}
+          {launch.tagline || launch.description}
         </p>
       </CardContent>
       
@@ -40,14 +53,14 @@ export default function LaunchCard({ launch }: LaunchCardProps) {
           {formatDate(launch.launchedAt)}
         </span>
         <div className="flex items-center gap-2">
-          <SourceBadge source={launch.source} url={launch.url} />
+          <SourceBadge source={launch.source} url={launch.sourceUrl || launch.url} />
           <a
             href={launch.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-zinc-900 dark:text-zinc-100 font-semibold hover:underline inline-flex items-center gap-0.5"
           >
-            {launch.source === 'ph' ? 'Product Hunt' : 'Hacker News'} <ArrowUpRight size={12} />
+            {getLaunchLabel(launch.source)} <ArrowUpRight size={12} />
           </a>
         </div>
       </CardFooter>

@@ -9,43 +9,61 @@ generator client {
 }
 
 model Article {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   title       String
   url         String   @unique
-  summary     String
+  summary     String?
   source      String
-  publishedAt DateTime
+  sourceUrl   String
+  geography   String?  // "US" | "EU" | "SEA" | "India" | "LATAM" | "Africa" | "Global"
   tags String
+  publishedAt DateTime
   createdAt   DateTime @default(now())
 }
 
-model Job {
-  id          String   @id @default(uuid())
-  title       String
-  company     String
-  location    String
-  equity      String?
-  salaryRange String?
-  url         String   @unique
-  source      String
-  postedAt    DateTime
-  role        String   // engineering, product, design, marketing, etc.
-  stage       String?  // seed, series-a, etc.
-}
-
 model Launch {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   title       String
-  description String
+  tagline     String?
   url         String   @unique
-  source      String   // ph, hn
+  sourceUrl   String
+  source      String   // "ph" | "hn"
   upvotes     Int      @default(0)
   launchedAt  DateTime
 }
 
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  company     String
+  location    String?
+  remote      Boolean  @default(false)
+  equity      String?
+  url         String   @unique
+  sourceUrl   String
+  source      String
+  role        String?
+  stage       String?
+  geography   String?
+  postedAt    DateTime
+}
+
+model GithubRepo {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  url         String   @unique
+  stars       Int
+  language    String?
+  topics String
+  owner       String
+  fetchedAt   DateTime @default(now())
+}
+
 model DigestSubscriber {
-  id        String   @id @default(uuid())
+  id        String   @id @default(cuid())
   email     String   @unique
+  geography String?  // which region's digest they want
   createdAt DateTime @default(now())
   active    Boolean  @default(true)
 }

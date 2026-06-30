@@ -1,148 +1,164 @@
-# Stackd — The Open Source Indian Startup Ecosystem Hub
+# Stackd - Open Source Global Startup Ecosystem Intelligence
 
-> One place for everything happening in the Indian startup ecosystem. Funding news, accelerator cohorts, investor profiles, startup jobs, and new product launches — all aggregated from public sources, always linking back to the original.
+> One place for everything in the global startup ecosystem. Funding rounds, accelerator cohorts, investor profiles, startup jobs, and product launches, aggregated from public APIs and feeds worldwide with every item linking back to its original source.
 
-**We are an aggregator, not a replacement.** Every piece of content links to its original source.
+**We are an aggregator. We claim ownership of nothing. Every item links to its source.**
 
----
+## What Makes Stackd Different
 
-## Features
-- 📰 **Ecosystem News**: Curated news feeds from Inc42, YourStory, and TechCrunch India.
-- 🎓 **Cohort Tracker**: Upcoming deadlines, geographies, and investment details for major accelerators.
-- 💼 **Jobs Feed**: Latest startup job openings (never stores application data; always links to source).
-- 💰 **Investor Directory**: Curated profiles of active venture capital funds and angels investing in India.
-- 🚀 **Product Launches**: Recency-sorted releases aggregated from Product Hunt and Hacker News.
-- 📧 **Weekly Digest**: Automatically compiled email roundup sent to subscribers every Sunday morning.
+- Global by default: Americas, Europe, SEA, India, LATAM, Africa, and Global.
+- Works with zero API keys: Hacker News, RSS feeds, local JSON directories, and SQLite are enough for a demo.
+- Cross-entity search: one query across startups, investors, news, jobs, cohorts, and launches.
+- Community data: `data/cohorts.json`, `data/investors.json`, and `data/startups.json` are open for PRs.
+- No accounts: the only user data stored is digest subscriber email.
 
----
+## Stack
 
-## Tech Stack
-- **Frontend**: Next.js 14/15 (App Router, Tailwind CSS, TypeScript, shadcn/ui components)
-- **Backend**: Python 3.11+ (FastAPI, APScheduler, Resend SDK)
-- **Database**: PostgreSQL (Production) + SQLite local fallback (Development) using Prisma ORM
+- Frontend: Next.js App Router, Tailwind CSS, shadcn-style components.
+- Backend: Python FastAPI, APScheduler, Prisma Client Python.
+- Database: SQLite for local development, PostgreSQL for production.
+- Email: Resend for digest delivery.
 
----
+## Quick Start
 
-## Repository Structure
-```
-/stackd
-├── frontend/                    # Next.js Application
-│   ├── app/                     # Page views (news, cohorts, jobs, investors, launches, startups)
-│   ├── components/              # Core UI cards, Feed components, Newsletter subscriptions
-│   └── lib/                     # API client utilities, helper modules
-├── backend/                     # FastAPI Application
-│   ├── main.py                  # App initialization and lifecycles
-│   ├── db.py                    # Prisma DB client exporter
-│   ├── scheduler.py             # Scheduled scrapers and email dispatching
-│   ├── setup_db.py              # Automatic database setup helper
-│   ├── routes/                  # API router definitions
-│   └── scrapers/                # Parser engines (RSS, HN, Product Hunt, Reddit, YC Jobs)
-├── data/                        # JSON database directories (Community Maintained)
-│   ├── cohorts.json             # Accelerator lists
-│   ├── investors.json           # Investor lists
-│   └── startups.json            # Startup profiles
-├── vercel.json                  # Vercel deploy configuration
-├── railway.json                 # Railway backend deploy configuration
-└── Procfile                     # Railway startup commands
+### 1. Backend
+
+```powershell
+git clone https://github.com/your-username/stackd.git
+cd stackd
+copy .env.example .env
+
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
+
+python backend\setup_db.py
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
----
+The backend runs at `http://127.0.0.1:8000`.
 
-## Local Setup
+Check it:
 
-### Prerequisite Checklist
-Make sure you have the following installed:
-- Node.js (v18+)
-- Python (3.11+)
-- Git
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+```
 
-### 1. Database & Backend Configuration
+Populate local data immediately:
 
-1. Clone the repository and navigate into it:
-   ```bash
-   git clone https://github.com/your-username/stackd.git
-   cd stackd
-   ```
+```powershell
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/api/admin/refresh
+```
 
-2. Copy the template env file:
-   ```bash
-   cp .env.example .env
-   ```
-   *Note: For local development, `DATABASE_URL` defaults to `file:./dev.db` (SQLite).*
+### 2. Frontend
 
-3. Initialize the Python virtual environment and activate it:
-   - **Windows (PowerShell):**
-     ```powershell
-     python -m venv venv
-     .\venv\Scripts\Activate.ps1
-     ```
-   - **macOS/Linux:**
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate
-     ```
+Open a second terminal:
 
-4. Install the required backend dependencies:
-   ```bash
-   pip install -r backend/requirements.txt
-   ```
+```powershell
+cd stackd\frontend
+npm install
+npm run dev
+```
 
-5. Setup the local database:
-   ```bash
-   python backend/setup_db.py
-   ```
-   *This automatically rewrites the Prisma schema database provider to SQLite, pushes the schema, and generates the Python client.*
+The frontend runs at `http://127.0.0.1:3000` or `http://localhost:3000`.
 
-6. Start the FastAPI development server:
-   ```bash
-   uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-   *The backend will be available at `http://localhost:8000`. You can inspect the interactive OpenAPI spec at `/docs`.*
+For local development, `NEXT_PUBLIC_API_URL` should be:
 
----
+```env
+NEXT_PUBLIC_API_URL="http://127.0.0.1:8000"
+```
 
-### 2. Frontend Configuration
+## Environment Variables
 
-1. Open a new terminal window and navigate to the `frontend/` directory:
-   ```bash
-   cd frontend
-   ```
+Backend:
 
-2. Install the frontend dependencies:
-   ```bash
-   npm install
-   ```
+```env
+DATABASE_URL="file:./dev.db"
+RESEND_API_KEY=""
+RESEND_FROM_EMAIL="digest@example.com"
+PH_API_KEY=""
+REDDIT_CLIENT_ID=""
+REDDIT_CLIENT_SECRET=""
+GITHUB_TOKEN=""
+CORS_ORIGINS="http://localhost:3000,http://127.0.0.1:3000,https://your-vercel-domain.vercel.app"
+```
 
-3. Start the Next.js development server:
-   ```bash
-   npm run dev
-   ```
-   *The frontend will be available at `http://localhost:3000`.*
+Frontend:
 
----
+```env
+NEXT_PUBLIC_API_URL="http://127.0.0.1:8000"
+```
 
-## Scraper Run Schedule
-The backend scheduler executes the scrapers periodically using APScheduler. Scraper intervals are configured as follows:
-- **News Scraper** (`scrape_rss`): Runs every 2 hours (Inc42, YourStory, TechCrunch India).
-- **HN Launch Scraper** (`scrape_hn`): Runs every 6 hours (Hacker News Algolia API).
-- **Product Hunt Scraper** (`scrape_ph`): Runs every 24 hours (GraphQL API, requires `PH_API_KEY`).
-- **Reddit Scraper** (`scrape_reddit`): Runs every 6 hours (Reddit API, requires client credentials).
-- **Jobs Scraper** (`scrape_jobs`): Runs every 12 hours (YC job board parser).
-- **Email Digest** (`send_weekly_digest`): Sends every Sunday at 9:00 AM IST (3:30 AM UTC, requires `RESEND_API_KEY`).
+Production notes:
 
----
+- `DATABASE_URL` should be your Railway PostgreSQL connection string.
+- `NEXT_PUBLIC_API_URL` should be your deployed Railway backend URL.
+- `RESEND_API_KEY` is only required for sending digest emails.
+- Product Hunt, Reddit, and GitHub tokens are optional. Missing optional keys must not crash the app.
 
-## Contributing
+## API
 
-We welcome your contributions! To learn more about coding practices, adding data sources, or updating directory entries, please read our [CONTRIBUTING.md](CONTRIBUTING.md) guide.
+All list responses include:
 
-### Core Guidelines:
-1. **Always Attribute**: We are an aggregator. Never hide the source logo/text, and always link back to original URLs.
-2. **Support Dark Mode**: Ensure any new components are fully responsive and support dark theme options using Tailwind `dark:` styles.
-3. **Write Tests**: Keep the test suite passing by running `python -m pytest backend/tests/` before pushing code.
+```json
+{ "data": [], "total": 0, "page": 1, "limit": 50, "hasMore": false }
+```
 
----
+Important routes:
+
+- `GET /health`
+- `GET /api/news`
+- `GET /api/launches`
+- `GET /api/jobs`
+- `GET /api/funding`
+- `GET /api/startups`
+- `GET /api/cohorts`
+- `GET /api/investors`
+- `GET /api/github`
+- `GET /api/search?q=ai`
+- `POST /api/digest/subscribe`
+- `POST /api/admin/refresh`
+
+## Fetch Schedule
+
+- News RSS: every 2 hours.
+- Indie Hackers RSS: every 2 hours.
+- Hacker News: every 6 hours.
+- Reddit: every 6 hours, skipped unless credentials are present.
+- Product Hunt: every 24 hours, skipped unless `PH_API_KEY` is present.
+- GitHub: every 24 hours, works without a token but benefits from `GITHUB_TOKEN`.
+- Jobs: every 12 hours.
+- Weekly digest: Sunday 09:00 UTC.
+
+## Adding Data
+
+Community-maintained JSON files live in `data/`.
+
+- Add accelerators to `data/cohorts.json`.
+- Add investors to `data/investors.json`.
+- Add startup profiles to `data/startups.json`.
+
+Always include a `sourceUrl`.
+
+## Verification
+
+Useful checks before shipping:
+
+```powershell
+python -m pytest backend\tests -q
+cd frontend
+npm run lint
+npm run build
+```
+
+Then run:
+
+```powershell
+Invoke-RestMethod -Method Post http://127.0.0.1:8000/api/admin/refresh
+Invoke-RestMethod http://127.0.0.1:8000/api/news
+Invoke-RestMethod http://127.0.0.1:8000/api/search?q=ai
+```
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+MIT

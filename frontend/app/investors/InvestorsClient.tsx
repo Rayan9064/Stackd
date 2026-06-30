@@ -17,6 +17,7 @@ export default function InvestorsClient({ currentPage, totalPages }: InvestorsCl
   const currentSearch = searchParams.get('search') || '';
   const currentSector = searchParams.get('sector') || '';
   const currentStage = searchParams.get('stage') || '';
+  const currentGeography = searchParams.get('geography') || '';
 
   const updateUrl = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -47,6 +48,10 @@ export default function InvestorsClient({ currentPage, totalPages }: InvestorsCl
 
   const handleStage = (val: string) => {
     updateUrl({ stage: val });
+  };
+
+  const handleGeography = (val: string) => {
+    updateUrl({ geography: val });
   };
 
   const handlePageChange = (page: number) => {
@@ -82,6 +87,21 @@ export default function InvestorsClient({ currentPage, totalPages }: InvestorsCl
         { label: 'Series A', value: 'series a' },
         { label: 'Series B', value: 'series b' },
         { label: 'Growth', value: 'growth' }
+      ]
+    },
+    {
+      name: 'Geography',
+      placeholder: 'Select Region',
+      value: currentGeography,
+      onChange: handleGeography,
+      options: [
+        { label: 'Americas / US', value: 'US' },
+        { label: 'Europe', value: 'EU' },
+        { label: 'Southeast Asia', value: 'SEA' },
+        { label: 'India', value: 'INDIA' },
+        { label: 'Latin America', value: 'LATAM' },
+        { label: 'Africa', value: 'AFRICA' },
+        { label: 'Global', value: 'GLOBAL' }
       ]
     }
   ];

@@ -9,6 +9,8 @@ export const revalidate = 3600;
 interface PageProps {
   searchParams: Promise<{
     role?: string;
+    remote?: string;
+    geography?: string;
     location?: string;
     stage?: string;
     search?: string;
@@ -20,6 +22,9 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const resolvedParams = await searchParams;
   const page = resolvedParams.page ? parseInt(resolvedParams.page) : 1;
   const role = resolvedParams.role || '';
+  const geography = resolvedParams.geography || '';
+  const remoteParam = resolvedParams.remote;
+  const remote = remoteParam === 'true' ? true : remoteParam === 'false' ? false : undefined;
   const location = resolvedParams.location || '';
   const stage = resolvedParams.stage || '';
   const search = resolvedParams.search || '';
@@ -30,6 +35,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
     page,
     limit,
     role,
+    remote,
+    geography,
     location,
     stage,
     search
@@ -43,11 +50,11 @@ export default async function JobsPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       {/* Page Header */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 font-heading">
           Startup Jobs Board
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Aggregated startup career opportunities in India. Always linking back to the original listing.
+          Aggregated startup career opportunities worldwide. Always linking back to the original listing.
         </p>
       </div>
 

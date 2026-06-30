@@ -10,15 +10,35 @@ interface SourceBadgeProps {
 }
 
 export default function SourceBadge({ source, url, className = '' }: SourceBadgeProps) {
-  // Normalize source name for display
   const getDisplayName = (src: string) => {
-    switch (src.toLowerCase()) {
+    const srcLower = src.toLowerCase();
+    if (srcLower.startsWith('reddit/r/')) {
+      return srcLower.replace('reddit/', '');
+    }
+    
+    switch (srcLower) {
       case 'inc42':
         return 'Inc42';
       case 'yourstory':
         return 'YourStory';
       case 'techcrunch':
-        return 'TechCrunch India';
+        return 'TechCrunch';
+      case 'venturebeat':
+        return 'VentureBeat';
+      case 'sifted':
+        return 'Sifted (Europe)';
+      case 'techinasia':
+        return 'Tech in Asia';
+      case 'e27':
+        return 'e27';
+      case 'thenextweb':
+        return 'TNW';
+      case 'maddyness':
+        return 'Maddyness';
+      case 'indiehackers':
+        return 'Indie Hackers';
+      case 'github':
+        return 'GitHub';
       case 'hn':
       case 'hackernews':
         return 'Hacker News';
@@ -35,13 +55,34 @@ export default function SourceBadge({ source, url, className = '' }: SourceBadge
   };
 
   const getSourceStyles = (src: string) => {
-    switch (src.toLowerCase()) {
+    const srcLower = src.toLowerCase();
+    if (srcLower.startsWith('reddit/')) {
+      return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50';
+    }
+    
+    switch (srcLower) {
       case 'inc42':
         return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50';
       case 'yourstory':
         return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50';
       case 'techcrunch':
-        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50';
+      case 'venturebeat':
+        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50';
+      case 'sifted':
+        return 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-400 dark:border-violet-900/50';
+      case 'techinasia':
+        return 'bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400 dark:border-yellow-900/50';
+      case 'e27':
+        return 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-900/50';
+      case 'thenextweb':
+        return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50';
+      case 'maddyness':
+        return 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50';
+      case 'indiehackers':
+        return 'bg-zinc-100 text-zinc-800 border-zinc-300 dark:bg-zinc-900 dark:text-zinc-300 dark:border-zinc-800';
+      case 'github':
+        return 'bg-zinc-800 text-zinc-100 border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:border-zinc-800';
       case 'hn':
       case 'hackernews':
         return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50';

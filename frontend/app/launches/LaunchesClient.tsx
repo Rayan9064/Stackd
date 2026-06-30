@@ -53,7 +53,8 @@ export default function LaunchesClient({ currentPage, totalPages }: LaunchesClie
       onChange: handleSource,
       options: [
         { label: 'Product Hunt', value: 'ph' },
-        { label: 'Hacker News', value: 'hn' }
+        { label: 'Hacker News', value: 'hn' },
+        { label: 'GitHub Trending', value: 'github' }
       ]
     }
   ];
