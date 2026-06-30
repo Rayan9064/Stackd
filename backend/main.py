@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Database and Scheduler
-from backend.db import db
+from backend.db import db, db_status
 from backend.scheduler import scheduler, setup_scheduler
 
 # Routers
@@ -110,8 +110,10 @@ app.include_router(admin_router)
 
 @app.get("/health")
 async def health_check():
+    database = await db_status()
     return {
-        "status": "ok",
+        "status": "ok" if database["connected"] else "degraded",
+        "database": database,
         "timestamp": datetime.now(timezone.utc)
     }
 

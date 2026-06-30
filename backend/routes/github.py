@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from backend.db import db
+from backend.db import db, ensure_db_connected
 
 router = APIRouter(prefix="/api/github", tags=["github"])
 
@@ -10,8 +10,7 @@ async def get_github_repos(
     limit: int = Query(20, ge=1, le=100),
     language: Optional[str] = Query(None)
 ):
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
         
     where = {}
     if language:

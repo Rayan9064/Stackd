@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from backend.db import db
+from backend.db import db, ensure_db_connected
 
 router = APIRouter(prefix="/api/funding", tags=["funding"])
 
@@ -12,8 +12,7 @@ async def get_funding_rounds(
     stage: Optional[str] = Query(None),
     search: Optional[str] = Query(None)
 ):
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
         
     where = {}
     

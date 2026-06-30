@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from backend.db import db
+from backend.db import db, ensure_db_connected
 
 router = APIRouter(prefix="/api/launches", tags=["launches"])
 
@@ -10,8 +10,7 @@ async def get_launches(
     limit: int = Query(30, ge=1, le=100),
     source: Optional[str] = Query(None)
 ):
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
         
     offset = (page - 1) * limit
     

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
-from backend.db import db
+from backend.db import db, ensure_db_connected
 from backend.fetchers.github_fetcher import scrape_github
 from backend.fetchers.hn_fetcher import scrape_hn
 from backend.fetchers.indiehackers_fetcher import scrape_indiehackers
@@ -28,8 +28,7 @@ async def _counts():
 
 @router.post("/refresh")
 async def refresh_all_sources():
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
 
     refresh_started_at = datetime.now(timezone.utc)
     before = await _counts()

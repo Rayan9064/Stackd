@@ -2,7 +2,7 @@ import os
 import json
 from fastapi import APIRouter, Query
 from typing import Optional, List, Dict, Any
-from backend.db import db
+from backend.db import db, ensure_db_connected
 
 router = APIRouter(prefix="/api/search", tags=["search"])
 
@@ -20,8 +20,7 @@ async def global_search(
     q: str = Query("", min_length=0),
     types: Optional[str] = Query(None)
 ):
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
         
     query_str = q.strip().lower()
     
