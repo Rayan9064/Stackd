@@ -121,13 +121,13 @@ Important routes:
 
 ## Fetch Schedule
 
-- News RSS: every 2 hours.
-- Indie Hackers RSS: every 2 hours.
-- Hacker News: every 6 hours.
-- Reddit: every 6 hours, skipped unless credentials are present.
+- News RSS: every 24 hours.
+- Indie Hackers RSS: every 24 hours.
+- Hacker News: every 24 hours.
+- Reddit: every 24 hours, skipped unless credentials are present.
 - Product Hunt: every 24 hours, skipped unless `PH_API_KEY` is present.
 - GitHub: every 24 hours, works without a token but benefits from `GITHUB_TOKEN`.
-- Jobs: every 12 hours.
+- Jobs: every 24 hours.
 - Weekly digest: Sunday 09:00 UTC.
 
 ## Adding Data

@@ -188,13 +188,13 @@ async def send_weekly_digest():
     logger.info(f"Successfully sent weekly digest to {success_count}/{len(subscribers)} subscribers")
 
 def setup_scheduler():
-    # Schedule fetchers
-    scheduler.add_job(scrape_rss, 'interval', hours=2, id='scrape_rss', replace_existing=True)
-    scheduler.add_job(scrape_indiehackers, 'interval', hours=2, id='scrape_indiehackers', replace_existing=True)
-    scheduler.add_job(scrape_hn, 'interval', hours=6, id='scrape_hn', replace_existing=True)
+    # Keep scheduled ingestion modest for free-tier hosting. Use /api/admin/refresh for demos.
+    scheduler.add_job(scrape_rss, 'interval', hours=24, id='scrape_rss', replace_existing=True)
+    scheduler.add_job(scrape_indiehackers, 'interval', hours=24, id='scrape_indiehackers', replace_existing=True)
+    scheduler.add_job(scrape_hn, 'interval', hours=24, id='scrape_hn', replace_existing=True)
     scheduler.add_job(scrape_ph, 'interval', hours=24, id='scrape_ph', replace_existing=True)
-    scheduler.add_job(scrape_reddit, 'interval', hours=6, id='scrape_reddit', replace_existing=True)
-    scheduler.add_job(scrape_jobs, 'interval', hours=12, id='scrape_jobs', replace_existing=True)
+    scheduler.add_job(scrape_reddit, 'interval', hours=24, id='scrape_reddit', replace_existing=True)
+    scheduler.add_job(scrape_jobs, 'interval', hours=24, id='scrape_jobs', replace_existing=True)
     scheduler.add_job(scrape_github, 'interval', hours=24, id='scrape_github', replace_existing=True)
     
     # Schedule weekly digest (Sunday 9:00 AM UTC)
