@@ -29,7 +29,7 @@ export function formatDate(dateString: string): string {
         year: "numeric",
       });
     }
-  } catch (e) {
+  } catch {
     return dateString;
   }
 }
@@ -49,7 +49,7 @@ export function getDaysRemaining(dateString: string): number {
     now.setHours(0, 0, 0, 0);
     const diffMs = deadline.getTime() - now.getTime();
     return Math.ceil(diffMs / 86400000);
-  } catch (e) {
+  } catch {
     return -1;
   }
 }

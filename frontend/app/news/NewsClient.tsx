@@ -16,6 +16,7 @@ export default function NewsClient({ currentPage, totalPages }: NewsClientProps)
 
   const currentSearch = searchParams.get('search') || '';
   const currentSource = searchParams.get('source') || '';
+  const currentGeography = searchParams.get('geography') || '';
 
   const updateUrl = (newParams: Record<string, string | null>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -44,6 +45,10 @@ export default function NewsClient({ currentPage, totalPages }: NewsClientProps)
     updateUrl({ source: val });
   };
 
+  const handleGeography = (val: string) => {
+    updateUrl({ geography: val });
+  };
+
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
@@ -57,10 +62,30 @@ export default function NewsClient({ currentPage, totalPages }: NewsClientProps)
       value: currentSource,
       onChange: handleSource,
       options: [
-        { label: 'Inc42', value: 'inc42' },
-        { label: 'YourStory', value: 'yourstory' },
-        { label: 'TechCrunch India', value: 'techcrunch' },
+        { label: 'TechCrunch', value: 'techcrunch' },
+        { label: 'VentureBeat', value: 'venturebeat' },
+        { label: 'Sifted', value: 'sifted' },
+        { label: 'Tech in Asia', value: 'techinasia' },
+        { label: 'e27', value: 'e27' },
+        { label: 'The Next Web', value: 'thenextweb' },
+        { label: 'Maddyness', value: 'maddyness' },
+        { label: 'Indie Hackers', value: 'indiehackers' },
         { label: 'Reddit', value: 'reddit' }
+      ]
+    },
+    {
+      name: 'Geography',
+      placeholder: 'Select Region',
+      value: currentGeography,
+      onChange: handleGeography,
+      options: [
+        { label: 'Americas / US', value: 'US' },
+        { label: 'Europe', value: 'EU' },
+        { label: 'Southeast Asia', value: 'SEA' },
+        { label: 'India', value: 'INDIA' },
+        { label: 'Latin America', value: 'LATAM' },
+        { label: 'Africa', value: 'AFRICA' },
+        { label: 'Global', value: 'GLOBAL' }
       ]
     }
   ];

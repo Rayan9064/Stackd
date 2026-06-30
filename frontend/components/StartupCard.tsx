@@ -3,7 +3,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Startup } from '@/lib/api';
 import SourceBadge from './SourceBadge';
-import { Globe, MapPin, DollarSign, ArrowUpRight } from 'lucide-react';
+import GeoBadge from './GeoBadge';
+import { MapPin, ArrowUpRight } from 'lucide-react';
 
 interface StartupCardProps {
   startup: Startup;
@@ -15,7 +16,10 @@ export default function StartupCard({ startup }: StartupCardProps) {
       <CardHeader className="p-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-0.5">
-            <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50">
+            <div className="flex items-center gap-1.5">
+              <GeoBadge geo={startup.geography} />
+            </div>
+            <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
               {startup.name}
             </CardTitle>
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
@@ -51,7 +55,7 @@ export default function StartupCard({ startup }: StartupCardProps) {
           {startup.sector}
         </Badge>
         <div className="flex items-center gap-2">
-          <SourceBadge source="Startup Profile" url={startup.website} />
+          <SourceBadge source="Startup Profile" url={startup.sourceUrl || startup.website} />
           <a
             href={startup.website}
             target="_blank"

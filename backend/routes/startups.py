@@ -7,13 +7,10 @@ router = APIRouter(tags=["startups-cohorts-investors"])
 
 # Helper to read JSON data files
 def read_json_data(filename: str):
-    # Path relative to workspace root (parent of backend)
     path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', filename)
     if not os.path.exists(path):
-        # Fallback if run inside backend directory
         path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', filename)
     if not os.path.exists(path):
-        # Fallback to local copy
         return None
         
     with open(path, 'r', encoding='utf-8') as f:
@@ -25,12 +22,12 @@ async def get_startups(
     limit: int = Query(50, ge=1, le=100),
     sector: Optional[str] = Query(None),
     stage: Optional[str] = Query(None),
+    geography: Optional[str] = Query(None),
     search: Optional[str] = Query(None)
 ):
     data_dict = read_json_data("startups.json")
     startups = data_dict.get("startups", []) if data_dict else []
     
-    # Filter
     filtered = startups
     if sector:
         sect_lower = sector.lower().strip()
@@ -40,6 +37,10 @@ async def get_startups(
         stage_lower = stage.lower().strip()
         filtered = [s for s in filtered if stage_lower in s.get("stage", "").lower()]
         
+    if geography:
+        geo_lower = geography.lower().strip()
+        filtered = [s for s in filtered if geo_lower in s.get("geography", "").lower()]
+        
     if search:
         q = search.lower().strip()
         filtered = [
@@ -47,11 +48,9 @@ async def get_startups(
             if q in s.get("name", "").lower() or q in s.get("sector", "").lower() or q in s.get("oneLiner", "").lower()
         ]
         
-    # Paginate
     offset = (page - 1) * limit
     paginated = filtered[offset : offset + limit]
     
-    # Map to return sourceUrl (website) for each startup profile
     data = []
     for s in paginated:
         data.append({
@@ -63,35 +62,61 @@ async def get_startups(
         "data": data,
         "total": len(filtered),
         "page": page,
-        "limit": limit
+        "limit": limit,
+        "hasMore": offset + len(data) < len(filtered)
     }
 
 @router.get("/api/cohorts")
-async def get_cohorts():
+async def get_cohorts(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    geography: Optional[str] = Query(None),
+    open: Optional[str] = Query(None),
+    search: Optional[str] = Query(None)
+):
     data_dict = read_json_data("cohorts.json")
     cohorts = data_dict.get("cohorts", []) if data_dict else []
     
+    filtered = cohorts
+    
+    if geography:
+        geo_lower = geography.lower().strip()
+        filtered = [c for c in filtered if geo_lower in c.get("geography", "").lower()]
+        
+    if open is not None:
+        is_open = open.lower() == "true"
+        filtered = [c for c in filtered if c.get("open") == is_open]
+        
+    if search:
+        q = search.lower().strip()
+        filtered = [
+            c for c in filtered
+            if q in c.get("name", "").lower() or any(q in s.lower() for s in c.get("sectors", []))
+        ]
+        
     # Sort by deadline ascending
-    # Parse deadlines formatted as YYYY-MM-DD
     def get_deadline_key(c):
         d = c.get("deadline", "")
         return d if d else "9999-12-31"
         
-    sorted_cohorts = sorted(cohorts, key=get_deadline_key)
+    sorted_cohorts = sorted(filtered, key=get_deadline_key)
     
-    # Map sourceUrl (applyUrl)
+    offset = (page - 1) * limit
+    paginated = sorted_cohorts[offset : offset + limit]
+    
     data = []
-    for c in sorted_cohorts:
+    for c in paginated:
         data.append({
             **c,
-            "sourceUrl": c.get("applyUrl")
+            "sourceUrl": c.get("sourceUrl") or c.get("applyUrl")
         })
         
     return {
         "data": data,
         "total": len(sorted_cohorts),
-        "page": 1,
-        "limit": len(sorted_cohorts)
+        "page": page,
+        "limit": limit,
+        "hasMore": offset + len(data) < len(sorted_cohorts)
     }
 
 @router.get("/api/investors")
@@ -100,6 +125,7 @@ async def get_investors(
     limit: int = Query(50, ge=1, le=100),
     sector: Optional[str] = Query(None),
     stage: Optional[str] = Query(None),
+    geography: Optional[str] = Query(None),
     search: Optional[str] = Query(None)
 ):
     data_dict = read_json_data("investors.json")
@@ -118,7 +144,14 @@ async def get_investors(
         stage_lower = stage.lower().strip()
         filtered = [
             inv for inv in filtered
-            if any(stage_lower in stg.lower() for stg in inv.get("stage", []))
+            if any(stage_lower in stg.lower() for stg in inv.get("stage", [])) or any(stage_lower in stg.lower() for stg in inv.get("stages", []))
+        ]
+        
+    if geography:
+        geo_lower = geography.lower().strip()
+        filtered = [
+            inv for inv in filtered
+            if geo_lower in inv.get("geography", "").lower()
         ]
         
     if search:
@@ -131,17 +164,17 @@ async def get_investors(
     offset = (page - 1) * limit
     paginated = filtered[offset : offset + limit]
     
-    # Map sourceUrl (website)
     data = []
     for inv in paginated:
         data.append({
             **inv,
-            "sourceUrl": inv.get("website")
+            "sourceUrl": inv.get("sourceUrl") or inv.get("website")
         })
         
     return {
         "data": data,
         "total": len(filtered),
         "page": page,
-        "limit": limit
+        "limit": limit,
+        "hasMore": offset + len(data) < len(filtered)
     }

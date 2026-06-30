@@ -7,12 +7,14 @@ import resend
 from jinja2 import Template
 from backend.db import db
 
-# Import scrapers
-from backend.scrapers.rss_scraper import scrape_rss
-from backend.scrapers.hn_scraper import scrape_hn
-from backend.scrapers.ph_scraper import scrape_ph
-from backend.scrapers.reddit_scraper import scrape_reddit
-from backend.scrapers.jobs_scraper import scrape_jobs
+# Import fetchers
+from backend.fetchers.news_fetcher import scrape_rss
+from backend.fetchers.hn_fetcher import scrape_hn
+from backend.fetchers.ph_fetcher import scrape_ph
+from backend.fetchers.reddit_fetcher import scrape_reddit
+from backend.fetchers.jobs_fetcher import scrape_jobs
+from backend.fetchers.github_fetcher import scrape_github
+from backend.fetchers.indiehackers_fetcher import scrape_indiehackers
 
 logger = logging.getLogger("scheduler")
 logging.basicConfig(level=logging.INFO)
@@ -25,7 +27,7 @@ EMAIL_TEMPLATE = """
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Stackd India Startup Digest</title>
+  <title>Stackd Global Startup Digest</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #111827; background-color: #f9fafb; margin: 0; padding: 0; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 20px; }
@@ -47,8 +49,8 @@ EMAIL_TEMPLATE = """
 <body>
   <div class="container">
     <div class="header">
-      <a href="https://stackd.in" class="logo">Stackd</a>
-      <div class="subtitle">Your weekly roundup of the Indian startup ecosystem. Aggregated from public sources.</div>
+      <a href="https://stackd.global" class="logo">Stackd</a>
+      <div class="subtitle">Your weekly roundup of the global startup ecosystem. Aggregated from public sources.</div>
     </div>
 
     {% if articles %}
@@ -100,7 +102,7 @@ EMAIL_TEMPLATE = """
 
     <div class="footer">
       <p>You are receiving this because you subscribed to the Stackd weekly digest.</p>
-      <p><a href="https://stackd.in/unsubscribe" class="unsubscribe-link">Unsubscribe</a></p>
+      <p><a href="https://stackd.global/unsubscribe" class="unsubscribe-link">Unsubscribe</a></p>
     </div>
   </div>
 </body>
@@ -176,7 +178,7 @@ async def send_weekly_digest():
             resend.Emails.send({
                 "from": f"Stackd <{from_email}>",
                 "to": sub.email,
-                "subject": "Weekly Startup Ecosystem Digest — Stackd India",
+                "subject": "Weekly Startup Ecosystem Digest — Stackd",
                 "html": html_content
             })
             success_count += 1
@@ -186,17 +188,19 @@ async def send_weekly_digest():
     logger.info(f"Successfully sent weekly digest to {success_count}/{len(subscribers)} subscribers")
 
 def setup_scheduler():
-    # Schedule scrapers
+    # Schedule fetchers
     scheduler.add_job(scrape_rss, 'interval', hours=2, id='scrape_rss', replace_existing=True)
+    scheduler.add_job(scrape_indiehackers, 'interval', hours=2, id='scrape_indiehackers', replace_existing=True)
     scheduler.add_job(scrape_hn, 'interval', hours=6, id='scrape_hn', replace_existing=True)
     scheduler.add_job(scrape_ph, 'interval', hours=24, id='scrape_ph', replace_existing=True)
     scheduler.add_job(scrape_reddit, 'interval', hours=6, id='scrape_reddit', replace_existing=True)
     scheduler.add_job(scrape_jobs, 'interval', hours=12, id='scrape_jobs', replace_existing=True)
+    scheduler.add_job(scrape_github, 'interval', hours=24, id='scrape_github', replace_existing=True)
     
-    # Schedule weekly digest (Sunday 9:00 AM IST -> Sunday 3:30 AM UTC)
+    # Schedule weekly digest (Sunday 9:00 AM UTC)
     scheduler.add_job(
         send_weekly_digest,
-        CronTrigger(day_of_week='sun', hour=3, minute=30, timezone=timezone.utc),
+        CronTrigger(day_of_week='sun', hour=9, minute=0, timezone=timezone.utc),
         id='send_weekly_digest',
         replace_existing=True
     )

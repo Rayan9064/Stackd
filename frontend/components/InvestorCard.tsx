@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Investor } from '@/lib/api';
 import SourceBadge from './SourceBadge';
+import GeoBadge from './GeoBadge';
 import { Twitter, Linkedin, Globe, MapPin, ArrowUpRight } from 'lucide-react';
 
 interface InvestorCardProps {
@@ -31,9 +32,12 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
     <Card className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-lg flex flex-col justify-between h-full hover:border-zinc-400 dark:hover:border-zinc-650 transition-colors">
       <CardHeader className="p-4 pb-2">
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 font-mono tracking-tight uppercase">
-            {investor.firm}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 font-mono tracking-tight uppercase">
+              {investor.firm}
+            </span>
+            <GeoBadge geo={investor.geography} />
+          </div>
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
             {investor.name}
           </CardTitle>
@@ -56,14 +60,14 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
             <span className="text-[10px] uppercase text-zinc-400 block font-sans">Location</span>
             <span className="inline-flex items-center gap-1 text-zinc-800 dark:text-zinc-200">
               <MapPin size={11} className="text-zinc-400" />
-              {investor.location}
+              {investor.location || 'Global'}
             </span>
           </div>
         </div>
         
         {/* Sectors */}
         <div className="flex flex-wrap gap-1 pt-1">
-          {investor.sectors.slice(0, 3).map((sector, i) => (
+          {investor.sectors && investor.sectors.slice(0, 3).map((sector, i) => (
             <Badge
               key={i}
               variant="secondary"
@@ -72,7 +76,7 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
               {sector}
             </Badge>
           ))}
-          {investor.sectors.length > 3 && (
+          {investor.sectors && investor.sectors.length > 3 && (
             <span className="text-[9px] text-zinc-400 self-center font-mono">+{investor.sectors.length - 3}</span>
           )}
         </div>
@@ -112,7 +116,7 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <SourceBadge source="Investor Directory" url={investor.website} />
+          <SourceBadge source="Investor Directory" url={investor.sourceUrl || investor.website} />
           <a
             href={investor.website}
             target="_blank"

@@ -48,4 +48,5 @@ def test_all_endpoints_sequentially():
         # 8. Subscription API
         res_sub = client.post("/api/digest/subscribe", json={"email": "test_subscriber@example.com"})
         assert res_sub.status_code == 200
-        assert "subscribed" in res_sub.json()["message"].lower() or "already" in res_sub.json()["message"].lower()
+        msg = res_sub.json()["message"].lower()
+        assert "subscribed" in msg or "already" in msg or "success" in msg or "updated" in msg

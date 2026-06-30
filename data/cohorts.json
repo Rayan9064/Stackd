@@ -1,69 +1,192 @@
 {
-  "comment": "Community maintained — submit a PR to add or update entries",
+  "comment": "Community maintained — submit a PR to add or update entries. Always include a sourceUrl.",
   "cohorts": [
     {
       "name": "Y Combinator",
+      "geography": "Global",
       "deadline": "2026-09-08",
-      "investmentAmount": "$500,000",
-      "geography": "Global / US",
+      "investment": "$500,000",
+      "equity": "7%",
       "sectors": ["SaaS", "AI", "Fintech", "Consumer", "B2B", "Healthcare"],
-      "applyUrl": "https://www.ycombinator.com/apply"
-    },
-    {
-      "name": "Surge by Peak XV",
-      "deadline": "2026-07-10",
-      "investmentAmount": "$1,000,000 - $3,000,000",
-      "geography": "India & Southeast Asia",
-      "sectors": ["SaaS", "Fintech", "Consumer", "AI", "Climate Tech"],
-      "applyUrl": "https://www.surgeahead.com"
-    },
-    {
-      "name": "Antler India",
-      "deadline": "2026-08-31",
-      "investmentAmount": "$250,000",
-      "geography": "India",
-      "sectors": ["SaaS", "Web3", "AI", "Fintech", "Direct-to-Consumer"],
-      "applyUrl": "https://www.antler.co/india"
-    },
-    {
-      "name": "100X.VC",
-      "deadline": "2026-07-05",
-      "investmentAmount": "₹1.25 Crore",
-      "geography": "India",
-      "sectors": ["SaaS", "B2B", "Consumer", "Deeptech", "Fintech"],
-      "applyUrl": "https://www.100x.vc"
-    },
-    {
-      "name": "ah! Ventures",
-      "deadline": "2026-08-15",
-      "investmentAmount": "₹50 Lakhs - ₹10 Crores",
-      "geography": "India",
-      "sectors": ["Sector Agnostic"],
-      "applyUrl": "https://www.ahventures.in"
-    },
-    {
-      "name": "NASSCOM 10,000 Startups",
-      "deadline": "2026-09-15",
-      "investmentAmount": "Equity-free incubation & mentorship",
-      "geography": "India",
-      "sectors": ["Tech", "Deeptech", "Enterprise Software", "AI"],
-      "applyUrl": "https://10000startups.com"
-    },
-    {
-      "name": "Alliance DAO",
-      "deadline": "2026-07-20",
-      "investmentAmount": "$250,000",
-      "geography": "Global / India",
-      "sectors": ["Web3", "Crypto", "DeFi", "Infrastructure"],
-      "applyUrl": "https://alliance.xyz"
+      "applyUrl": "https://www.ycombinator.com/apply",
+      "sourceUrl": "https://www.ycombinator.com/apply",
+      "open": true
     },
     {
       "name": "Techstars",
+      "geography": "Global",
       "deadline": "2026-10-01",
-      "investmentAmount": "$120,000",
-      "geography": "Global / India",
-      "sectors": ["SaaS", "Healthcare", "Deeptech", "B2B Software"],
-      "applyUrl": "https://www.techstars.com"
+      "investment": "$120,000",
+      "equity": "6%",
+      "sectors": ["SaaS", "Healthcare", "Deeptech", "B2B Software", "AI"],
+      "applyUrl": "https://www.techstars.com/accelerator",
+      "sourceUrl": "https://www.techstars.com",
+      "open": true
+    },
+    {
+      "name": "500 Global",
+      "geography": "Global",
+      "deadline": "2026-08-15",
+      "investment": "$150,000",
+      "equity": "6%",
+      "sectors": ["SaaS", "Fintech", "Deeptech", "Consumer", "AI"],
+      "applyUrl": "https://500.co/accelerator",
+      "sourceUrl": "https://500.co",
+      "open": true
+    },
+    {
+      "name": "Antler",
+      "geography": "Global",
+      "deadline": "2026-08-31",
+      "investment": "$250,000",
+      "equity": "10%",
+      "sectors": ["SaaS", "Web3", "AI", "Fintech", "Direct-to-Consumer"],
+      "applyUrl": "https://www.antler.co/apply",
+      "sourceUrl": "https://www.antler.co",
+      "open": true
+    },
+    {
+      "name": "Surge by Peak XV",
+      "geography": "SEA",
+      "deadline": "2026-07-10",
+      "investment": "$1,000,000 - $3,000,000",
+      "equity": "Undisclosed",
+      "sectors": ["SaaS", "Fintech", "Consumer", "AI", "Climate Tech"],
+      "applyUrl": "https://www.surgeahead.com/apply",
+      "sourceUrl": "https://www.surgeahead.com",
+      "open": true
+    },
+    {
+      "name": "Alliance DAO",
+      "geography": "Global",
+      "deadline": "2026-07-20",
+      "investment": "$250,000",
+      "equity": "9%",
+      "sectors": ["Web3", "Crypto", "DeFi", "Infrastructure"],
+      "applyUrl": "https://alliance.xyz/apply",
+      "sourceUrl": "https://alliance.xyz",
+      "open": true
+    },
+    {
+      "name": "On Deck",
+      "geography": "Global",
+      "deadline": "2026-09-12",
+      "investment": "Equity-free cohort fee applies",
+      "equity": "0%",
+      "sectors": ["SaaS", "AI", "Consumer", "B2B"],
+      "applyUrl": "https://www.beondeck.com",
+      "sourceUrl": "https://www.beondeck.com",
+      "open": true
+    },
+    {
+      "name": "Pioneer",
+      "geography": "Global",
+      "deadline": "2026-07-01",
+      "investment": "$20,000",
+      "equity": "2%",
+      "sectors": ["Software", "AI", "Research", "Open Source"],
+      "applyUrl": "https://pioneer.app",
+      "sourceUrl": "https://pioneer.app",
+      "open": true
+    },
+    {
+      "name": "Entrepreneur First",
+      "geography": "Global",
+      "deadline": "2026-08-01",
+      "investment": "£80,000 stipend + investment option",
+      "equity": "8%",
+      "sectors": ["Deeptech", "AI", "Robotics", "Crypto", "Bio-tech"],
+      "applyUrl": "https://www.joinef.com",
+      "sourceUrl": "https://www.joinef.com",
+      "open": true
+    },
+    {
+      "name": "Founders Factory",
+      "geography": "EU",
+      "deadline": "2026-07-31",
+      "investment": "£50,000 + operational support",
+      "equity": "7%",
+      "sectors": ["Fintech", "Climate", "Health", "AI"],
+      "applyUrl": "https://foundersfactory.com",
+      "sourceUrl": "https://foundersfactory.com",
+      "open": true
+    },
+    {
+      "name": "Plug and Play",
+      "geography": "Global",
+      "deadline": "2026-12-31",
+      "investment": "Varies",
+      "equity": "0%",
+      "sectors": ["Enterprise Software", "Logistics", "Energy", "Fintech"],
+      "applyUrl": "https://www.plugandplaytechcenter.com",
+      "sourceUrl": "https://www.plugandplaytechcenter.com",
+      "open": true
+    },
+    {
+      "name": "SOSV",
+      "geography": "Global",
+      "deadline": "2026-09-30",
+      "investment": "$150,000 - $250,000",
+      "equity": "7%",
+      "sectors": ["Deeptech", "Climate Tech", "Hard Science", "Bio-tech"],
+      "applyUrl": "https://sosv.com/apply",
+      "sourceUrl": "https://sosv.com",
+      "open": true
+    },
+    {
+      "name": "MassChallenge",
+      "geography": "US",
+      "deadline": "2026-06-15",
+      "investment": "Equity-free grants",
+      "equity": "0%",
+      "sectors": ["Sector Agnostic"],
+      "applyUrl": "https://masschallenge.org/apply",
+      "sourceUrl": "https://masschallenge.org",
+      "open": false
+    },
+    {
+      "name": "Startupbootcamp",
+      "geography": "EU",
+      "deadline": "2026-11-01",
+      "investment": "€15,000",
+      "equity": "8%",
+      "sectors": ["IoT", "Fintech", "Smart Cities", "Digital Health"],
+      "applyUrl": "https://www.startupbootcamp.org",
+      "sourceUrl": "https://www.startupbootcamp.org",
+      "open": true
+    },
+    {
+      "name": "Station F",
+      "geography": "EU",
+      "deadline": "2026-09-15",
+      "investment": "Incubation",
+      "equity": "0%",
+      "sectors": ["SaaS", "Deeptech", "Retail", "Gaming"],
+      "applyUrl": "https://stationf.co/apply",
+      "sourceUrl": "https://stationf.co",
+      "open": true
+    },
+    {
+      "name": "Wayra",
+      "geography": "LATAM",
+      "deadline": "2026-10-15",
+      "investment": "$100,000",
+      "equity": "7%",
+      "sectors": ["Telecom", "SaaS", "AI", "Cybersecurity"],
+      "applyUrl": "https://www.wayra.com/apply",
+      "sourceUrl": "https://www.wayra.com",
+      "open": true
+    },
+    {
+      "name": "GSMA Ecosystem Accelerator",
+      "geography": "Africa",
+      "deadline": "2026-07-15",
+      "investment": "Equity-free grants up to £250k",
+      "equity": "0%",
+      "sectors": ["Mobile Tech", "AgriTech", "EdTech", "Climate Adaptation"],
+      "applyUrl": "https://www.gsma.com",
+      "sourceUrl": "https://www.gsma.com",
+      "open": true
     }
   ]
 }

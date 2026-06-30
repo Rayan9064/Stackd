@@ -13,16 +13,46 @@ async def get_launches(
     if not db.is_connected():
         await db.connect()
         
+    offset = (page - 1) * limit
+    
+    if source == "github":
+        total = await db.githubrepo.count()
+        repos = await db.githubrepo.find_many(
+            order={"stars": "desc"},
+            skip=offset,
+            take=limit
+        )
+        data = []
+        for r in repos:
+            data.append({
+                "id": r.id,
+                "title": r.name,
+                "tagline": r.description,
+                "description": r.description, # fallback for older frontend components
+                "url": r.url,
+                "sourceUrl": r.url,
+                "source": "github",
+                "upvotes": r.stars,
+                "launchedAt": r.fetchedAt
+            })
+        return {
+            "data": data,
+            "total": total,
+            "page": page,
+            "limit": limit,
+            "hasMore": offset + len(data) < total
+        }
+        
     where = {}
     if source:
         sources = [s.strip().lower() for s in source.split(",") if s.strip()]
+        # Filter out github if mixed in standard launches table
+        sources = [s for s in sources if s != "github"]
         if len(sources) == 1:
             where["source"] = sources[0]
-        else:
+        elif len(sources) > 1:
             where["source"] = {"in": sources}
             
-    offset = (page - 1) * limit
-    
     total = await db.launch.count(where=where)
     launches = await db.launch.find_many(
         where=where,
@@ -36,9 +66,10 @@ async def get_launches(
         data.append({
             "id": lnch.id,
             "title": lnch.title,
-            "description": lnch.description,
+            "tagline": lnch.tagline,
+            "description": lnch.tagline, # fallback
             "url": lnch.url,
-            "sourceUrl": lnch.url, # Always link to original source
+            "sourceUrl": lnch.sourceUrl or lnch.url,
             "source": lnch.source,
             "upvotes": lnch.upvotes,
             "launchedAt": lnch.launchedAt
@@ -48,5 +79,6 @@ async def get_launches(
         "data": data,
         "total": total,
         "page": page,
-        "limit": limit
+        "limit": limit,
+        "hasMore": offset + len(data) < total
     }

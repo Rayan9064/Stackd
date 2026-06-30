@@ -3,8 +3,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { Job } from '@/lib/api';
 import SourceBadge from './SourceBadge';
+import GeoBadge from './GeoBadge';
 import { formatDate } from '@/lib/utils';
-import { Briefcase, MapPin, DollarSign, ArrowUpRight } from 'lucide-react';
+import { MapPin, DollarSign, ArrowUpRight, Wifi } from 'lucide-react';
 
 interface JobCardProps {
   job: Job;
@@ -19,11 +20,14 @@ export default function JobCard({ job }: JobCardProps) {
             <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 font-mono tracking-tight uppercase">
               {job.company}
             </span>
-            {job.stage && (
-              <Badge variant="outline" className="bg-zinc-50 text-zinc-500 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 text-[10px] py-0 px-1.5 font-normal capitalize">
-                {job.stage}
-              </Badge>
-            )}
+            <div className="flex items-center gap-1.5">
+              <GeoBadge geo={job.geography} />
+              {job.stage && (
+                <Badge variant="outline" className="bg-zinc-50 text-zinc-500 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 text-[10px] py-0 px-1.5 font-normal capitalize">
+                  {job.stage}
+                </Badge>
+              )}
+            </div>
           </div>
           <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
             {job.title}
@@ -35,14 +39,19 @@ export default function JobCard({ job }: JobCardProps) {
         <div className="flex flex-col gap-1.5 text-xs text-zinc-500 dark:text-zinc-400">
           <div className="flex items-center gap-1.5">
             <MapPin size={13} className="text-zinc-400" />
-            <span>{job.location}</span>
+            <span>{job.location || 'Global'}</span>
           </div>
-          {(job.salaryRange || job.equity) && (
+          {job.remote && (
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+              <Wifi size={13} />
+              <span>Remote Available</span>
+            </div>
+          )}
+          {job.equity && (
             <div className="flex items-center gap-1.5 font-mono text-zinc-600 dark:text-zinc-300">
               <DollarSign size={13} className="text-zinc-400" />
               <span>
-                {job.salaryRange || 'Competitive Pay'}
-                {job.equity ? ` • ${job.equity} Equity` : ''}
+                Competitive Pay • {job.equity} Equity
               </span>
             </div>
           )}
@@ -53,7 +62,7 @@ export default function JobCard({ job }: JobCardProps) {
             variant="secondary"
             className="bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 text-[10px] font-normal capitalize"
           >
-            {job.role}
+            {job.role || 'General'}
           </Badge>
         </div>
       </CardContent>
@@ -63,7 +72,7 @@ export default function JobCard({ job }: JobCardProps) {
           {formatDate(job.postedAt)}
         </span>
         <div className="flex items-center gap-2">
-          <SourceBadge source={job.source} url={job.url} />
+          <SourceBadge source={job.source} url={job.sourceUrl || job.url} />
           <a
             href={job.url}
             target="_blank"
