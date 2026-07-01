@@ -4,8 +4,8 @@ import CohortCard from '@/components/CohortCard';
 import CohortsClient from './CohortsClient';
 import { Plus } from 'lucide-react';
 
-// Revalidate this page every hour (ISR)
-export const revalidate = 3600;
+// Always render with current backend data.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   searchParams: Promise<{

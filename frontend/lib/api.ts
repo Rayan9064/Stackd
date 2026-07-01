@@ -120,7 +120,7 @@ async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise
   try {
     const res = await fetch(url, {
       ...options,
-      next: { revalidate: 3600, ...(options.next || {}) } // Default Cache for 1 Hour
+      cache: 'no-store'
     });
     
     if (!res.ok) {

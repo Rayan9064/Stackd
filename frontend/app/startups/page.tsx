@@ -4,8 +4,8 @@ import StartupCard from '@/components/StartupCard';
 import StartupsClient from './StartupsClient';
 import { Plus } from 'lucide-react';
 
-// Revalidate this page every hour (ISR)
-export const revalidate = 3600;
+// Always render with current backend data.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   searchParams: Promise<{

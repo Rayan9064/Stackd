@@ -3,8 +3,8 @@ import { api } from '@/lib/api';
 import JobCard from '@/components/JobCard';
 import JobsClient from './JobsClient';
 
-// Revalidate this page every hour (ISR)
-export const revalidate = 3600;
+// Always render with current backend data.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   searchParams: Promise<{

@@ -3,8 +3,8 @@ import { api } from '@/lib/api';
 import LaunchCard from '@/components/LaunchCard';
 import LaunchesClient from './LaunchesClient';
 
-// Revalidate this page every hour (ISR)
-export const revalidate = 3600;
+// Always render with current backend data.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   searchParams: Promise<{
