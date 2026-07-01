@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Investor } from '@/lib/api';
 import SourceBadge from './SourceBadge';
 import GeoBadge from './GeoBadge';
-import { Twitter, Linkedin, Globe, MapPin, ArrowUpRight } from 'lucide-react';
+import { Twitter, Linkedin, Globe, MapPin } from 'lucide-react';
 
 interface InvestorCardProps {
   investor: Investor;
@@ -38,8 +38,10 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
             </span>
             <GeoBadge geo={investor.geography} />
           </div>
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
-            {investor.name}
+          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1 hover:underline">
+            <a href={investor.website} target="_blank" rel="noopener noreferrer">
+              {investor.name}
+            </a>
           </CardTitle>
         </div>
       </CardHeader>
@@ -82,7 +84,7 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 pt-2 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
+      <CardFooter className="p-4 pt-2 border-t border-zinc-100 dark:border-zinc-900 flex min-h-12 items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           {investor.xHandle && (
             <a
@@ -115,17 +117,7 @@ export default function InvestorCard({ investor }: InvestorCardProps) {
             </a>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <SourceBadge source="Investor Directory" url={investor.sourceUrl || investor.website} />
-          <a
-            href={investor.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-900 dark:text-zinc-100 font-semibold hover:underline inline-flex items-center gap-0.5"
-          >
-            Website <ArrowUpRight size={12} />
-          </a>
-        </div>
+        <SourceBadge source="Investor Directory" url={investor.sourceUrl || investor.website} />
       </CardFooter>
     </Card>
   );

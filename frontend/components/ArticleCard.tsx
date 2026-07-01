@@ -31,7 +31,7 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         </p>
       </CardContent>
       
-      <CardFooter className="p-4 pt-0 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
+      <CardFooter className="p-4 pt-0 border-t border-zinc-100 dark:border-zinc-900 flex min-h-12 items-center justify-between gap-2">
         <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
           {formatDate(article.publishedAt)}
         </span>

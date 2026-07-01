@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, Geist_Mono } from "next/font/google";
 import Link from 'next/link';
+import SiteNav from '@/components/SiteNav';
 
 import "./globals.css";
 
@@ -41,30 +42,7 @@ export default function RootLayout({
                 Stackd
               </Link>
               
-              {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-6">
-                <Link href="/news" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  News
-                </Link>
-                <Link href="/funding" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Funding
-                </Link>
-                <Link href="/launches" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Launches
-                </Link>
-                <Link href="/cohorts" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Cohorts
-                </Link>
-                <Link href="/jobs" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Jobs
-                </Link>
-                <Link href="/investors" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Investors
-                </Link>
-                <Link href="/startups" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors">
-                  Startups
-                </Link>
-              </nav>
+              <SiteNav />
             </div>
             
             {/* Right side helper info */}
@@ -79,31 +57,7 @@ export default function RootLayout({
               </a>
             </div>
           </div>
-          
-          {/* Mobile Navigation bar */}
-          <div className="flex md:hidden items-center justify-around h-10 border-t border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-950/50 text-xs overflow-x-auto whitespace-nowrap">
-            <Link href="/news" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              News
-            </Link>
-            <Link href="/funding" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Funding
-            </Link>
-            <Link href="/launches" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Launches
-            </Link>
-            <Link href="/cohorts" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Cohorts
-            </Link>
-            <Link href="/jobs" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Jobs
-            </Link>
-            <Link href="/investors" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Investors
-            </Link>
-            <Link href="/startups" className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-2 py-1">
-              Startups
-            </Link>
-          </div>
+          <SiteNav mobile />
         </header>
 
         {/* Page Content */}

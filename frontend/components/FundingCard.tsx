@@ -56,9 +56,9 @@ export default function FundingCard({ article }: FundingCardProps) {
         )}
       </a>
 
-      <div className="flex items-center gap-2 mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-900/60 text-[10px] text-zinc-400 font-mono">
-        <Calendar size={12} />
-        <span>{publishedDate}</span>
+      <div className="mt-4 flex min-h-8 items-center gap-2 border-t border-zinc-100 pt-3 text-[10px] font-mono text-zinc-400 dark:border-zinc-900/60">
+        <Calendar size={12} className="shrink-0" />
+        <span className="truncate">{publishedDate}</span>
       </div>
     </div>
   );

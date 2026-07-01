@@ -5,7 +5,7 @@ import { Cohort } from '@/lib/api';
 import SourceBadge from './SourceBadge';
 import GeoBadge from './GeoBadge';
 import { getDaysRemaining } from '@/lib/utils';
-import { Calendar, DollarSign, Percent, ArrowUpRight } from 'lucide-react';
+import { Calendar, DollarSign, Percent } from 'lucide-react';
 
 interface CohortCardProps {
   cohort: Cohort;
@@ -51,8 +51,10 @@ export default function CohortCard({ cohort }: CohortCardProps) {
       <CardHeader className="p-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
-            <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-              {cohort.name}
+            <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50 hover:underline">
+              <a href={cohort.applyUrl} target="_blank" rel="noopener noreferrer">
+                {cohort.name}
+              </a>
             </CardTitle>
             <div className="flex items-center gap-1.5 mt-1">
               <GeoBadge geo={cohort.geography} />
@@ -89,22 +91,12 @@ export default function CohortCard({ cohort }: CohortCardProps) {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 pt-3 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
+      <CardFooter className="p-4 pt-3 border-t border-zinc-100 dark:border-zinc-900 flex min-h-12 items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
           <Calendar size={12} />
           <span>Deadline: {new Date(cohort.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <SourceBadge source="Accelerator" url={cohort.sourceUrl || cohort.applyUrl} />
-          <a
-            href={cohort.applyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-900 hover:underline font-medium dark:text-zinc-100 inline-flex items-center gap-0.5"
-          >
-            Apply <ArrowUpRight size={12} />
-          </a>
-        </div>
+        <SourceBadge source="Accelerator" url={cohort.sourceUrl || cohort.applyUrl} />
       </CardFooter>
     </Card>
   );

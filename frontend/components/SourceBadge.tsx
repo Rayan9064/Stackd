@@ -103,13 +103,14 @@ export default function SourceBadge({ source, url, className = '' }: SourceBadge
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center hover:opacity-85 transition-opacity ${className}`}
+      className={`inline-flex min-w-0 items-center hover:opacity-85 transition-opacity ${className}`}
+      title={getDisplayName(source)}
     >
       <Badge
         variant="outline"
-        className={`font-mono text-[10px] tracking-wide py-0 px-2 rounded font-semibold border inline-flex items-center gap-1 cursor-pointer transition-colors ${getSourceStyles(source)}`}
+        className={`font-mono text-[10px] tracking-wide py-0 px-2 rounded font-semibold border inline-flex max-w-36 items-center gap-1 cursor-pointer truncate transition-colors ${getSourceStyles(source)}`}
       >
-        {getDisplayName(source)}
+        <span className="truncate">{getDisplayName(source)}</span>
         <ExternalLink size={10} className="opacity-70" />
       </Badge>
     </Link>

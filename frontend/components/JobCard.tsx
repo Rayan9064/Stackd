@@ -5,7 +5,7 @@ import { Job } from '@/lib/api';
 import SourceBadge from './SourceBadge';
 import GeoBadge from './GeoBadge';
 import { formatDate } from '@/lib/utils';
-import { MapPin, DollarSign, ArrowUpRight, Wifi } from 'lucide-react';
+import { MapPin, DollarSign, Wifi } from 'lucide-react';
 
 interface JobCardProps {
   job: Job;
@@ -29,8 +29,10 @@ export default function JobCard({ job }: JobCardProps) {
               )}
             </div>
           </div>
-          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
-            {job.title}
+          <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1 hover:underline">
+            <a href={job.url} target="_blank" rel="noopener noreferrer">
+              {job.title}
+            </a>
           </CardTitle>
         </div>
       </CardHeader>
@@ -67,21 +69,11 @@ export default function JobCard({ job }: JobCardProps) {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 pt-0 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
+      <CardFooter className="p-4 pt-0 border-t border-zinc-100 dark:border-zinc-900 flex min-h-12 items-center justify-between gap-2">
         <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
           {formatDate(job.postedAt)}
         </span>
-        <div className="flex items-center gap-2">
-          <SourceBadge source={job.source} url={job.sourceUrl || job.url} />
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-900 font-semibold dark:text-zinc-100 hover:underline inline-flex items-center gap-0.5"
-          >
-            Apply <ArrowUpRight size={12} />
-          </a>
-        </div>
+        <SourceBadge source={job.source} url={job.sourceUrl || job.url} />
       </CardFooter>
     </Card>
   );

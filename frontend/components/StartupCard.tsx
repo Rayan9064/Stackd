@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Startup } from '@/lib/api';
 import SourceBadge from './SourceBadge';
 import GeoBadge from './GeoBadge';
-import { MapPin, ArrowUpRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 interface StartupCardProps {
   startup: Startup;
@@ -19,8 +19,10 @@ export default function StartupCard({ startup }: StartupCardProps) {
             <div className="flex items-center gap-1.5">
               <GeoBadge geo={startup.geography} />
             </div>
-            <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1">
-              {startup.name}
+            <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1 hover:underline">
+              <a href={startup.website} target="_blank" rel="noopener noreferrer">
+                {startup.name}
+              </a>
             </CardTitle>
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
               <MapPin size={11} className="text-zinc-400" />
@@ -47,24 +49,14 @@ export default function StartupCard({ startup }: StartupCardProps) {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 pt-2 border-t border-zinc-100 dark:border-zinc-900 flex items-center justify-between gap-2 h-12">
+      <CardFooter className="p-4 pt-2 border-t border-zinc-100 dark:border-zinc-900 flex min-h-12 items-center justify-between gap-2">
         <Badge
           variant="secondary"
           className="bg-zinc-100 text-zinc-600 border border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800 text-[10px] font-normal"
         >
           {startup.sector}
         </Badge>
-        <div className="flex items-center gap-2">
-          <SourceBadge source="Startup Profile" url={startup.sourceUrl || startup.website} />
-          <a
-            href={startup.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-900 dark:text-zinc-100 font-semibold hover:underline inline-flex items-center gap-0.5"
-          >
-            Website <ArrowUpRight size={12} />
-          </a>
-        </div>
+        <SourceBadge source="Startup Profile" url={startup.sourceUrl || startup.website} />
       </CardFooter>
     </Card>
   );
