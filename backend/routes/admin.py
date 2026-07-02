@@ -11,6 +11,7 @@ from backend.fetchers.jobs_fetcher import scrape_jobs
 from backend.fetchers.news_fetcher import scrape_rss
 from backend.fetchers.ph_fetcher import scrape_ph
 from backend.fetchers.reddit_fetcher import scrape_reddit
+from backend.scripts.backfill_signals import run as run_signal_backfill
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 logger = logging.getLogger("admin")
@@ -23,6 +24,9 @@ async def _counts():
         "jobs": await db.job.count(),
         "githubRepos": await db.githubrepo.count(),
         "digestSubscribers": await db.digestsubscriber.count(),
+        "companies": await db.company.count(),
+        "signals": await db.signal.count(),
+        "sources": await db.source.count(),
     }
 
 
@@ -74,4 +78,20 @@ async def refresh_all_sources():
         "after": after,
         "inserted": inserted,
         "results": results,
+    }
+
+
+@router.post("/backfill-signals")
+async def backfill_signals():
+    await ensure_db_connected()
+    before = await _counts()
+    results = await run_signal_backfill()
+    after = await _counts()
+    inserted = {key: after[key] - before.get(key, 0) for key in after}
+    return {
+        "status": "completed",
+        "results": results,
+        "before": before,
+        "after": after,
+        "inserted": inserted,
     }

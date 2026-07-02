@@ -21,6 +21,71 @@ model Article {
   createdAt   DateTime @default(now())
 }
 
+model Company {
+  id              String         @id @default(cuid())
+  name            String
+  slug            String         @unique
+  website         String?        @unique
+  description     String?
+  sector          String?
+  stage           String?
+  geography       String?
+  location        String?
+  country         String?
+  logoUrl         String?
+  confidenceScore Float          @default(0.75)
+  aliases         CompanyAlias[]
+  signals         Signal[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model CompanyAlias {
+  id              String   @id @default(cuid())
+  companyId       String
+  alias           String
+  normalizedAlias String   @unique
+  domain          String?  @unique
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+
+  @@index([companyId])
+}
+
+model Source {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  type        String
+  baseUrl     String?
+  reliability Float    @default(0.7)
+  signals     Signal[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Signal {
+  id           String   @id @default(cuid())
+  companyId    String
+  sourceId     String?
+  type         String
+  title        String
+  url          String   @unique
+  summary      String?
+  occurredAt   DateTime
+  metadata     String?
+  externalType String?
+  externalId   String?
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  source       Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+
+  @@index([companyId])
+  @@index([sourceId])
+  @@index([type])
+  @@index([occurredAt])
+}
+
 model Launch {
   id          String   @id @default(cuid())
   title       String

@@ -29,9 +29,39 @@ async def global_search(
     if types:
         requested_types = [t.strip().lower() for t in types.split(",") if t.strip()]
     else:
-        requested_types = ["startups", "news", "jobs", "investors", "cohorts", "launches"]
+        requested_types = ["companies", "startups", "news", "jobs", "investors", "cohorts", "launches"]
         
     results: Dict[str, Any] = {}
+
+    if "companies" in requested_types:
+        where = {}
+        if query_str:
+            where["OR"] = [
+                {"name": {"contains": query_str}},
+                {"description": {"contains": query_str}},
+                {"sector": {"contains": query_str}},
+            ]
+        companies = await db.company.find_many(
+            where=where,
+            order={"updatedAt": "desc"},
+            take=20,
+        )
+        results["companies"] = [
+            {
+                "id": company.id,
+                "name": company.name,
+                "slug": company.slug,
+                "website": company.website,
+                "description": company.description,
+                "sector": company.sector,
+                "stage": company.stage,
+                "geography": company.geography,
+                "location": company.location,
+                "confidenceScore": company.confidenceScore,
+                "updatedAt": company.updatedAt,
+            }
+            for company in companies
+        ]
     
     # 1. Search News (Articles)
     if "news" in requested_types:

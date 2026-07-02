@@ -92,6 +92,39 @@ export interface Startup {
   sourceUrl: string;
 }
 
+export interface CompanySignal {
+  id: string;
+  companyId?: string;
+  type: string;
+  title: string;
+  url: string;
+  summary?: string | null;
+  occurredAt: string;
+  metadata?: string | null;
+  externalType?: string | null;
+  externalId?: string | null;
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  slug: string;
+  website?: string | null;
+  description?: string | null;
+  sector?: string | null;
+  stage?: string | null;
+  geography?: string | null;
+  location?: string | null;
+  country?: string | null;
+  logoUrl?: string | null;
+  confidenceScore: number;
+  signalCount?: number;
+  aliases?: Array<{ alias: string; domain?: string | null }>;
+  signals?: CompanySignal[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface GithubRepo {
   id: string;
   name: string;
@@ -106,6 +139,7 @@ export interface GithubRepo {
 }
 
 export interface SearchResults {
+  companies?: Company[];
   startups?: Startup[];
   news?: Article[];
   jobs?: Job[];
@@ -187,6 +221,32 @@ export const api = {
     if (params.search) query.append('search', params.search);
     
     return fetchAPI<PaginatedResponse<Startup>>(`/api/startups?${query.toString()}`);
+  },
+
+  // GET /api/companies
+  async getCompanies(params: { page?: number; limit?: number; sector?: string; geography?: string; search?: string } = {}): Promise<PaginatedResponse<Company>> {
+    const query = new URLSearchParams();
+    if (params.page) query.append('page', params.page.toString());
+    if (params.limit) query.append('limit', params.limit.toString());
+    if (params.sector) query.append('sector', params.sector);
+    if (params.geography) query.append('geography', params.geography);
+    if (params.search) query.append('search', params.search);
+
+    return fetchAPI<PaginatedResponse<Company>>(`/api/companies?${query.toString()}`);
+  },
+
+  // GET /api/companies/:slug
+  async getCompany(slug: string): Promise<Company> {
+    return fetchAPI<Company>(`/api/companies/${slug}`);
+  },
+
+  // GET /api/companies/:slug/signals
+  async getCompanySignals(slug: string, params: { type?: string; limit?: number } = {}): Promise<{ data: CompanySignal[]; total: number }> {
+    const query = new URLSearchParams();
+    if (params.type) query.append('type', params.type);
+    if (params.limit) query.append('limit', params.limit.toString());
+
+    return fetchAPI<{ data: CompanySignal[]; total: number }>(`/api/companies/${slug}/signals?${query.toString()}`);
   },
 
   // GET /api/cohorts
