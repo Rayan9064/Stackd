@@ -48,7 +48,7 @@ export default function RootLayout({
             {/* Right side helper info */}
             <div className="flex items-center gap-4">
               <a
-                href="https://github.com"
+                href="https://github.com/Rayan9064/Stackd"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 border border-zinc-200 dark:border-zinc-800 rounded px-2.5 py-1 font-semibold transition-colors"
@@ -75,7 +75,7 @@ export default function RootLayout({
               </p>
             </div>
             <div className="flex items-center gap-6">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+              <a href="https://github.com/Rayan9064/Stackd" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 GitHub Repo
               </a>
               <Link href="/funding" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
