@@ -4,8 +4,8 @@ import InvestorCard from '@/components/InvestorCard';
 import InvestorsClient from './InvestorsClient';
 import { Plus } from 'lucide-react';
 
-// Revalidate this page every hour (ISR)
-export const revalidate = 3600;
+// Always render with current backend data.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   searchParams: Promise<{
@@ -54,7 +54,7 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
         </div>
 
         <a
-          href="https://github.com"
+          href="https://github.com/Rayan9064/Stackd"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:underline border border-zinc-200 dark:border-zinc-800 rounded-md px-3 py-1.5 bg-white dark:bg-zinc-950 font-semibold"
@@ -89,7 +89,7 @@ export default async function InvestorsPage({ searchParams }: PageProps) {
         </p>
         <div className="pt-2">
           <a
-            href="https://github.com"
+            href="https://github.com/Rayan9064/Stackd"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline inline-flex items-center gap-0.5"
