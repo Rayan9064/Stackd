@@ -29,6 +29,7 @@ from backend.routes.funding import router as funding_router
 from backend.routes.github import router as github_router
 from backend.routes.search import router as search_router
 from backend.routes.admin import router as admin_router
+from backend.routes.companies import router as companies_router
 
 logger = logging.getLogger("main")
 logging.basicConfig(level=logging.INFO)
@@ -107,6 +108,7 @@ app.include_router(funding_router)
 app.include_router(github_router)
 app.include_router(search_router)
 app.include_router(admin_router)
+app.include_router(companies_router)
 
 @app.get("/health")
 async def health_check():

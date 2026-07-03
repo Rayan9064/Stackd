@@ -1,4 +1,10 @@
 *.log
+.env
+backend/.env
+*.db
+*.db-shm
+*.db-wal
+backend/prisma-query-engine-windows.exe
 __pycache__/
 .pytest_cache/
 frontend/.next/
