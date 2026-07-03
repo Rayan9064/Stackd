@@ -10,6 +10,7 @@ const navItems = [
   { href: '/cohorts', label: 'Cohorts' },
   { href: '/jobs', label: 'Jobs' },
   { href: '/investors', label: 'Investors' },
+  { href: '/companies', label: 'Companies' },
   { href: '/startups', label: 'Startups' },
 ];
 
