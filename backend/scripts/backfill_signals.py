@@ -32,6 +32,42 @@ def extract_launch_name(title: str) -> str:
     return name
 
 
+async def source_names_for_signals(signals):
+    names = set()
+    for signal in signals:
+        if not signal.sourceId:
+            continue
+        source = await db.source.find_unique(where={"id": signal.sourceId})
+        if source:
+            names.add(source.name)
+    return names
+
+
+async def prune_low_evidence_companies():
+    trusted_creation_sources = {"Startup Directory", "Product Hunt"}
+    companies = await db.company.find_many(take=1000)
+    pruned = 0
+
+    for company in companies:
+        signals = await db.signal.find_many(where={"companyId": company.id})
+        source_names = await source_names_for_signals(signals)
+        has_trusted_source = bool(source_names & trusted_creation_sources)
+        source_count = len(source_names)
+
+        should_prune = (
+            not company.website
+            and not has_trusted_source
+            and (source_count < 2 or len(signals) < 2)
+            and company.confidenceScore < 0.8
+        )
+
+        if should_prune:
+            await db.company.delete(where={"id": company.id})
+            pruned += 1
+
+    return pruned
+
+
 async def backfill_startup_directory():
     data = read_json_data("startups.json")
     count = 0
@@ -44,8 +80,10 @@ async def backfill_startup_directory():
             stage=startup.get("stage"),
             geography=startup.get("geography"),
             location=startup.get("location"),
-            confidence_score=0.9,
+            confidence_score=0.95,
         )
+        if not company:
+            continue
         await create_signal(
             company=company,
             source_name="Startup Directory",
@@ -70,7 +108,10 @@ async def backfill_jobs():
             geography=job.geography,
             stage=job.stage,
             confidence_score=0.7,
+            allow_create=False,
         )
+        if not company:
+            continue
         await create_signal(
             company=company,
             source_name="Jobs Feed",
@@ -101,8 +142,11 @@ async def backfill_launches():
         company = await resolve_company(
             name=name,
             description=launch.tagline,
-            confidence_score=0.6,
+            confidence_score=0.82 if launch.source == "ph" else 0.72,
+            allow_create=launch.source == "ph",
         )
+        if not company:
+            continue
         await create_signal(
             company=company,
             source_name="Hacker News" if launch.source == "hn" else "Product Hunt",
@@ -131,7 +175,10 @@ async def backfill_github_repos():
             name=repo.owner,
             description=repo.description,
             confidence_score=0.55,
+            allow_create=False,
         )
+        if not company:
+            continue
         await create_signal(
             company=company,
             source_name="GitHub",
@@ -169,7 +216,10 @@ async def backfill_funding_articles():
             description=article.summary,
             geography=article.geography,
             confidence_score=0.5,
+            allow_create=False,
         )
+        if not company:
+            continue
         await create_signal(
             company=company,
             source_name="Funding Feed",
@@ -194,13 +244,15 @@ async def backfill_funding_articles():
 async def run():
     await ensure_db_connected()
     await seed_sources()
-    return {
+    results = {
         "startupProfiles": await backfill_startup_directory(),
         "jobs": await backfill_jobs(),
         "launches": await backfill_launches(),
         "githubRepos": await backfill_github_repos(),
         "fundingArticles": await backfill_funding_articles(),
     }
+    results["prunedLowEvidenceCompanies"] = await prune_low_evidence_companies()
+    return results
 
 
 async def run_cli():

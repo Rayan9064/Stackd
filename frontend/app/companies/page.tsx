@@ -31,6 +31,7 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
   const totalItems = companiesRes?.total || 0;
   const totalPages = Math.ceil(totalItems / limit);
   const totalSignals = companies.reduce((sum, company) => sum + (company.signalCount || 0), 0);
+  const pageSources = new Set(companies.flatMap((company) => (company.sources || []).map((source) => source.name)));
 
   return (
     <div className="space-y-7">
@@ -45,7 +46,7 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
               Company Signal Graph
             </h1>
             <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Canonical company profiles resolved from launches, repositories, jobs, funding mentions, and startup profiles.
+              Canonical company profiles backed by trusted sources and corroborated ecosystem signals.
             </p>
           </div>
 
@@ -65,8 +66,8 @@ export default async function CompaniesPage({ searchParams }: PageProps) {
               <div className="font-mono text-lg font-semibold text-zinc-950 dark:text-zinc-50">{totalSignals}</div>
             </div>
             <div className="col-span-2 rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950 sm:col-span-1">
-              <div className="mb-1 text-xs text-zinc-500 dark:text-zinc-400">Sources</div>
-              <div className="font-mono text-lg font-semibold text-zinc-950 dark:text-zinc-50">7</div>
+              <div className="mb-1 text-xs text-zinc-500 dark:text-zinc-400">Page Sources</div>
+              <div className="font-mono text-lg font-semibold text-zinc-950 dark:text-zinc-50">{pageSources.size}</div>
             </div>
           </div>
         </div>

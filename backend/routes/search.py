@@ -3,6 +3,7 @@ import json
 from fastapi import APIRouter, Query
 from typing import Optional, List, Dict, Any
 from backend.db import db, ensure_db_connected
+from backend.routes.companies import company_to_dict, is_publishable_company, signal_stats
 
 router = APIRouter(prefix="/api/search", tags=["search"])
 
@@ -44,24 +45,16 @@ async def global_search(
         companies = await db.company.find_many(
             where=where,
             order={"updatedAt": "desc"},
-            take=20,
+            take=100,
         )
-        results["companies"] = [
-            {
-                "id": company.id,
-                "name": company.name,
-                "slug": company.slug,
-                "website": company.website,
-                "description": company.description,
-                "sector": company.sector,
-                "stage": company.stage,
-                "geography": company.geography,
-                "location": company.location,
-                "confidenceScore": company.confidenceScore,
-                "updatedAt": company.updatedAt,
-            }
-            for company in companies
-        ]
+        company_results = []
+        for company in companies:
+            signal_count, sources = await signal_stats(company.id)
+            if is_publishable_company(company, signal_count, sources):
+                company_results.append(company_to_dict(company, signal_count, sources))
+            if len(company_results) >= 20:
+                break
+        results["companies"] = company_results
     
     # 1. Search News (Articles)
     if "news" in requested_types:

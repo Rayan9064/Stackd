@@ -5,7 +5,37 @@ from backend.db import db, ensure_db_connected
 router = APIRouter(prefix="/api/companies", tags=["companies"])
 
 
-def company_to_dict(company, signal_count: int = 0):
+TRUSTED_COMPANY_SOURCES = {"Startup Directory", "Product Hunt"}
+
+
+async def signal_stats(company_id: str):
+    signals = await db.signal.find_many(where={"companyId": company_id})
+    source_ids = sorted({signal.sourceId for signal in signals if signal.sourceId})
+    sources = []
+    for source_id in source_ids:
+        source = await db.source.find_unique(where={"id": source_id})
+        if source:
+            sources.append({
+                "id": source.id,
+                "name": source.name,
+                "slug": source.slug,
+                "type": source.type,
+            })
+    return len(signals), sources
+
+
+def is_publishable_company(company, signal_count: int, sources: list[dict]) -> bool:
+    source_names = {source["name"] for source in sources}
+    return (
+        bool(company.website)
+        or bool(source_names & TRUSTED_COMPANY_SOURCES)
+        or len(source_names) >= 2
+        or (signal_count >= 2 and company.confidenceScore >= 0.8)
+    )
+
+
+def company_to_dict(company, signal_count: int = 0, sources: list[dict] | None = None):
+    sources = sources or []
     return {
         "id": company.id,
         "name": company.name,
@@ -20,8 +50,37 @@ def company_to_dict(company, signal_count: int = 0):
         "logoUrl": company.logoUrl,
         "confidenceScore": company.confidenceScore,
         "signalCount": signal_count,
+        "sourceCount": len(sources),
+        "sources": sources,
         "createdAt": company.createdAt,
         "updatedAt": company.updatedAt,
+    }
+
+
+async def signal_to_dict(signal):
+    source = None
+    if signal.sourceId:
+        source_record = await db.source.find_unique(where={"id": signal.sourceId})
+        if source_record:
+            source = {
+                "id": source_record.id,
+                "name": source_record.name,
+                "slug": source_record.slug,
+                "type": source_record.type,
+            }
+    return {
+        "id": signal.id,
+        "companyId": signal.companyId,
+        "type": signal.type,
+        "title": signal.title,
+        "url": signal.url,
+        "summary": signal.summary,
+        "occurredAt": signal.occurredAt,
+        "metadata": signal.metadata,
+        "externalType": signal.externalType,
+        "externalId": signal.externalId,
+        "sourceId": signal.sourceId,
+        "source": source,
     }
 
 
@@ -47,26 +106,27 @@ async def get_companies(
             {"sector": {"contains": q}},
         ]
 
-    offset = (page - 1) * limit
-    total = await db.company.count(where=where)
     companies = await db.company.find_many(
         where=where,
         order={"updatedAt": "desc"},
-        skip=offset,
-        take=limit,
+        take=1000,
     )
 
-    data = []
+    publishable = []
     for company in companies:
-        signal_count = await db.signal.count(where={"companyId": company.id})
-        data.append(company_to_dict(company, signal_count))
+        signal_count, sources = await signal_stats(company.id)
+        if is_publishable_company(company, signal_count, sources):
+            publishable.append(company_to_dict(company, signal_count, sources))
+
+    offset = (page - 1) * limit
+    data = publishable[offset:offset + limit]
 
     return {
         "data": data,
-        "total": total,
+        "total": len(publishable),
         "page": page,
         "limit": limit,
-        "hasMore": offset + len(data) < total,
+        "hasMore": offset + len(data) < len(publishable),
     }
 
 
@@ -78,6 +138,7 @@ async def get_company(slug: str):
         raise HTTPException(status_code=404, detail="Company not found")
 
     aliases = await db.companyalias.find_many(where={"companyId": company.id})
+    signal_count, sources = await signal_stats(company.id)
     signals = await db.signal.find_many(
         where={"companyId": company.id},
         order={"occurredAt": "desc"},
@@ -85,7 +146,7 @@ async def get_company(slug: str):
     )
 
     return {
-        **company_to_dict(company, len(signals)),
+        **company_to_dict(company, signal_count, sources),
         "aliases": [
             {
                 "alias": alias.alias,
@@ -93,20 +154,7 @@ async def get_company(slug: str):
             }
             for alias in aliases
         ],
-        "signals": [
-            {
-                "id": signal.id,
-                "type": signal.type,
-                "title": signal.title,
-                "url": signal.url,
-                "summary": signal.summary,
-                "occurredAt": signal.occurredAt,
-                "metadata": signal.metadata,
-                "externalType": signal.externalType,
-                "externalId": signal.externalId,
-            }
-            for signal in signals
-        ],
+        "signals": [await signal_to_dict(signal) for signal in signals],
     }
 
 
@@ -131,20 +179,6 @@ async def get_company_signals(
         take=limit,
     )
     return {
-        "data": [
-            {
-                "id": signal.id,
-                "companyId": signal.companyId,
-                "type": signal.type,
-                "title": signal.title,
-                "url": signal.url,
-                "summary": signal.summary,
-                "occurredAt": signal.occurredAt,
-                "metadata": signal.metadata,
-                "externalType": signal.externalType,
-                "externalId": signal.externalId,
-            }
-            for signal in signals
-        ],
+        "data": [await signal_to_dict(signal) for signal in signals],
         "total": len(signals),
     }

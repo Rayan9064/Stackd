@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowUpRight, Building2, CalendarDays, Globe2, MapPin, RadioTower } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import SourceBadge from '@/components/SourceBadge';
 import { api, type CompanySignal } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
@@ -34,6 +35,12 @@ function signalTone(type: string) {
   return 'border-zinc-500/40 bg-zinc-500/10 text-zinc-300';
 }
 
+function evidenceLabel(sourceCount = 0, signalCount = 0) {
+  if (sourceCount >= 2) return 'Corroborated';
+  if (signalCount >= 2) return 'Multi-signal';
+  return 'Single source';
+}
+
 function SignalRow({ signal }: { signal: CompanySignal }) {
   return (
     <article className="relative border-l border-zinc-200 pb-6 pl-5 last:pb-0 dark:border-zinc-800">
@@ -50,6 +57,9 @@ function SignalRow({ signal }: { signal: CompanySignal }) {
                 <ArrowUpRight size={13} />
               </a>
             </h2>
+            {signal.source && (
+              <SourceBadge source={signal.source.name} url={signal.url} />
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
             <CalendarDays size={13} />
@@ -74,6 +84,8 @@ export default async function CompanyDetailPage({ params }: PageProps) {
 
   const signals = company.signals || [];
   const location = company.location || company.geography || company.country || 'Global';
+  const sourceCount = company.sourceCount || company.sources?.length || 0;
+  const signalCount = company.signalCount || signals.length;
 
   return (
     <div className="space-y-7">
@@ -92,6 +104,11 @@ export default async function CompanyDetailPage({ params }: PageProps) {
               <Badge variant="secondary" className="rounded-md border border-zinc-200 bg-zinc-100 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
                 {company.stage || 'Tracked'}
               </Badge>
+              {(company.sources || []).map((source) => (
+                <Badge key={source.id} variant="outline" className="rounded-md border-zinc-200 bg-zinc-50 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+                  {source.name}
+                </Badge>
+              ))}
             </div>
             <div>
               <h1 className="font-heading text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
@@ -121,14 +138,14 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                 <RadioTower size={13} />
                 Signals
               </div>
-              <div className="font-mono text-xl font-semibold text-zinc-950 dark:text-zinc-50">{company.signalCount || signals.length}</div>
+              <div className="font-mono text-xl font-semibold text-zinc-950 dark:text-zinc-50">{signalCount}</div>
             </div>
             <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/60">
               <div className="mb-1 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400">
                 <Building2 size={13} />
-                Confidence
+                Evidence
               </div>
-              <div className="font-mono text-xl font-semibold text-zinc-950 dark:text-zinc-50">{Math.round(company.confidenceScore * 100)}%</div>
+              <div className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{evidenceLabel(sourceCount, signalCount)}</div>
             </div>
           </div>
         </div>

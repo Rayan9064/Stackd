@@ -103,6 +103,13 @@ export interface CompanySignal {
   metadata?: string | null;
   externalType?: string | null;
   externalId?: string | null;
+  sourceId?: string | null;
+  source?: {
+    id: string;
+    name: string;
+    slug: string;
+    type: string;
+  } | null;
 }
 
 export interface Company {
@@ -119,6 +126,13 @@ export interface Company {
   logoUrl?: string | null;
   confidenceScore: number;
   signalCount?: number;
+  sourceCount?: number;
+  sources?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    type: string;
+  }>;
   aliases?: Array<{ alias: string; domain?: string | null }>;
   signals?: CompanySignal[];
   createdAt: string;

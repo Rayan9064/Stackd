@@ -17,6 +17,22 @@ SOURCE_SEEDS = [
     {"name": "News Feed", "slug": "news-feed", "type": "rss", "baseUrl": None, "reliability": 0.65},
 ]
 
+WEAK_NAME_PREFIXES = (
+    "i ",
+    "i'",
+    "i’m",
+    "we ",
+    "we'",
+    "we’re",
+    "thanks",
+    "email ",
+    "ask ",
+    "how ",
+    "what ",
+    "why ",
+    "looking ",
+)
+
 
 def now_utc() -> datetime:
     return datetime.now(timezone.utc)
@@ -39,6 +55,25 @@ def extract_domain(url: Optional[str]) -> Optional[str]:
     parsed = urlparse(url if "://" in url else f"https://{url}")
     domain = parsed.netloc.lower().replace("www.", "")
     return domain or None
+
+
+def is_probable_company_name(name: str, website: Optional[str] = None) -> bool:
+    clean_name = re.sub(r"\s+", " ", name.strip())
+    if not clean_name:
+        return False
+    if website:
+        return True
+
+    lower_name = clean_name.lower()
+    if lower_name.startswith(WEAK_NAME_PREFIXES):
+        return False
+    if any(char in clean_name for char in ["?", "!"]):
+        return False
+    if len(clean_name) > 60:
+        return False
+    if len(clean_name.split()) > 5:
+        return False
+    return True
 
 
 async def seed_sources() -> None:
@@ -94,6 +129,34 @@ async def _create_alias(company_id: str, alias: str, domain: Optional[str] = Non
     await db.companyalias.create(data=data)
 
 
+async def _refresh_company_evidence(
+    company,
+    confidence_score: float,
+    description: Optional[str] = None,
+    sector: Optional[str] = None,
+    stage: Optional[str] = None,
+    geography: Optional[str] = None,
+    location: Optional[str] = None,
+):
+    update_data = {}
+    if confidence_score > company.confidenceScore:
+        update_data["confidenceScore"] = confidence_score
+    if description and not company.description:
+        update_data["description"] = description
+    if sector and not company.sector:
+        update_data["sector"] = sector
+    if stage and not company.stage:
+        update_data["stage"] = stage
+    if geography and not company.geography:
+        update_data["geography"] = geography
+    if location and not company.location:
+        update_data["location"] = location
+
+    if not update_data:
+        return company
+    return await db.company.update(where={"id": company.id}, data=update_data)
+
+
 async def resolve_company(
     name: str,
     website: Optional[str] = None,
@@ -103,6 +166,7 @@ async def resolve_company(
     geography: Optional[str] = None,
     location: Optional[str] = None,
     confidence_score: float = 0.75,
+    allow_create: bool = True,
 ):
     await ensure_db_connected()
     clean_name = name.strip()
@@ -116,22 +180,27 @@ async def resolve_company(
         company = await db.company.find_unique(where={"website": website})
         if company:
             await _create_alias(company.id, clean_name, domain)
-            return company
+            return await _refresh_company_evidence(company, confidence_score, description, sector, stage, geography, location)
 
     if domain:
         alias = await db.companyalias.find_unique(where={"domain": domain})
         if alias:
-            return await db.company.find_unique(where={"id": alias.companyId})
+            company = await db.company.find_unique(where={"id": alias.companyId})
+            return await _refresh_company_evidence(company, confidence_score, description, sector, stage, geography, location)
 
     alias = await db.companyalias.find_unique(where={"normalizedAlias": normalized_alias})
     if alias:
-        return await db.company.find_unique(where={"id": alias.companyId})
+        company = await db.company.find_unique(where={"id": alias.companyId})
+        return await _refresh_company_evidence(company, confidence_score, description, sector, stage, geography, location)
 
     slug = slugify(clean_name)
     company = await db.company.find_unique(where={"slug": slug})
     if company:
         await _create_alias(company.id, clean_name, domain)
-        return company
+        return await _refresh_company_evidence(company, confidence_score, description, sector, stage, geography, location)
+
+    if not allow_create or not is_probable_company_name(clean_name, website):
+        return None
 
     company = await db.company.create(data={
         "name": clean_name,
