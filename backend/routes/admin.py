@@ -11,6 +11,7 @@ from backend.fetchers.jobs_fetcher import scrape_jobs
 from backend.fetchers.news_fetcher import scrape_rss
 from backend.fetchers.ph_fetcher import scrape_ph
 from backend.fetchers.reddit_fetcher import scrape_reddit
+from backend.ingestion.runner import run_all_adapters
 from backend.scripts.backfill_signals import run as run_signal_backfill
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -27,6 +28,9 @@ async def _counts():
         "companies": await db.company.count(),
         "signals": await db.signal.count(),
         "sources": await db.source.count(),
+        "sourceRuns": await db.sourcerun.count(),
+        "unresolvedSignals": await db.unresolvedsignal.count(),
+        "founders": await db.founder.count(),
     }
 
 
@@ -67,6 +71,7 @@ async def refresh_all_sources():
                 "finishedAt": datetime.now(timezone.utc),
             })
 
+    adapter_results = await run_all_adapters()
     after = await _counts()
     inserted = {key: after[key] - before.get(key, 0) for key in after}
 
@@ -78,6 +83,7 @@ async def refresh_all_sources():
         "after": after,
         "inserted": inserted,
         "results": results,
+        "adapterResults": adapter_results,
     }
 
 
@@ -95,3 +101,83 @@ async def backfill_signals():
         "after": after,
         "inserted": inserted,
     }
+
+
+@router.get("/source-runs")
+async def source_runs(limit: int = 50):
+    await ensure_db_connected()
+    runs = await db.sourcerun.find_many(order={"startedAt": "desc"}, take=min(limit, 100))
+    return {
+        "data": [
+            {
+                "id": run.id,
+                "sourceKey": run.sourceKey,
+                "status": run.status,
+                "startedAt": run.startedAt,
+                "finishedAt": run.finishedAt,
+                "itemsFetched": run.itemsFetched,
+                "itemsInserted": run.itemsInserted,
+                "itemsDeduped": run.itemsDeduped,
+                "itemsUnresolved": run.itemsUnresolved,
+                "errorMessage": run.errorMessage,
+            }
+            for run in runs
+        ],
+        "total": len(runs),
+    }
+
+
+@router.get("/unresolved-signals")
+async def unresolved_signals(limit: int = 100):
+    await ensure_db_connected()
+    records = await db.unresolvedsignal.find_many(order={"createdAt": "desc"}, take=min(limit, 200))
+    return {
+        "data": [
+            {
+                "id": record.id,
+                "sourceKey": record.sourceKey,
+                "externalId": record.externalId,
+                "reason": record.reason,
+                "companyNameRaw": record.companyNameRaw,
+                "companyDomain": record.companyDomain,
+                "signalType": record.signalType,
+                "title": record.title,
+                "url": record.url,
+                "publishedAt": record.publishedAt,
+                "createdAt": record.createdAt,
+            }
+            for record in records
+        ],
+        "total": len(records),
+    }
+
+
+@router.get("/source-health")
+async def source_health():
+    await ensure_db_connected()
+    sources = await db.source.find_many(order={"slug": "asc"}, take=100)
+    data = []
+    for source in sources:
+        latest_run = await db.sourcerun.find_first(
+            where={"sourceKey": source.slug},
+            order={"startedAt": "desc"},
+        )
+        unresolved_count = await db.unresolvedsignal.count(where={"sourceKey": source.slug})
+        data.append({
+            "sourceKey": source.slug,
+            "name": source.name,
+            "type": source.type,
+            "reliability": source.reliability,
+            "latestRun": {
+                "status": latest_run.status,
+                "startedAt": latest_run.startedAt,
+                "finishedAt": latest_run.finishedAt,
+                "itemsFetched": latest_run.itemsFetched,
+                "itemsInserted": latest_run.itemsInserted,
+                "itemsDeduped": latest_run.itemsDeduped,
+                "itemsUnresolved": latest_run.itemsUnresolved,
+                "errorMessage": latest_run.errorMessage,
+            } if latest_run else None,
+            "unresolvedCount": unresolved_count,
+        })
+    return {"data": data, "total": len(data)}

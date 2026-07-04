@@ -110,6 +110,37 @@ export interface CompanySignal {
     slug: string;
     type: string;
   } | null;
+  sources?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    type: string;
+    externalId?: string;
+    url?: string | null;
+  }>;
+}
+
+export interface Founder {
+  id: string;
+  name: string;
+  slug: string;
+  headline?: string | null;
+  geography?: string | null;
+  linkedinUrl?: string | null;
+  xUrl?: string | null;
+  website?: string | null;
+  confidenceScore?: number;
+  role?: string | null;
+  title?: string | null;
+  sourceUrl?: string | null;
+  companies?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    role?: string | null;
+    title?: string | null;
+    sourceUrl?: string | null;
+  }>;
 }
 
 export interface Company {
@@ -133,6 +164,8 @@ export interface Company {
     slug: string;
     type: string;
   }>;
+  domains?: Array<{ domain: string; isPrimary: boolean }>;
+  founders?: Founder[];
   aliases?: Array<{ alias: string; domain?: string | null }>;
   signals?: CompanySignal[];
   createdAt: string;
@@ -261,6 +294,21 @@ export const api = {
     if (params.limit) query.append('limit', params.limit.toString());
 
     return fetchAPI<{ data: CompanySignal[]; total: number }>(`/api/companies/${slug}/signals?${query.toString()}`);
+  },
+
+  // GET /api/founders
+  async getFounders(params: { page?: number; limit?: number; search?: string } = {}): Promise<PaginatedResponse<Founder>> {
+    const query = new URLSearchParams();
+    if (params.page) query.append('page', params.page.toString());
+    if (params.limit) query.append('limit', params.limit.toString());
+    if (params.search) query.append('search', params.search);
+
+    return fetchAPI<PaginatedResponse<Founder>>(`/api/founders?${query.toString()}`);
+  },
+
+  // GET /api/founders/:slug
+  async getFounder(slug: string): Promise<Founder> {
+    return fetchAPI<Founder>(`/api/founders/${slug}`);
   },
 
   // GET /api/cohorts

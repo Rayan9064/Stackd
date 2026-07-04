@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowUpRight, Building2, CalendarDays, Globe2, MapPin, RadioTower } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Building2, CalendarDays, Globe2, MapPin, RadioTower, UserRound } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import SourceBadge from '@/components/SourceBadge';
 import { api, type CompanySignal } from '@/lib/api';
@@ -57,7 +57,13 @@ function SignalRow({ signal }: { signal: CompanySignal }) {
                 <ArrowUpRight size={13} />
               </a>
             </h2>
-            {signal.source && (
+            {(signal.sources || []).length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {(signal.sources || []).map((source) => (
+                  <SourceBadge key={`${signal.id}-${source.id}-${source.externalId}`} source={source.name} url={source.url || signal.url} />
+                ))}
+              </div>
+            ) : signal.source && (
               <SourceBadge source={signal.source.name} url={signal.url} />
             )}
           </div>
@@ -86,6 +92,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
   const location = company.location || company.geography || company.country || 'Global';
   const sourceCount = company.sourceCount || company.sources?.length || 0;
   const signalCount = company.signalCount || signals.length;
+  const founders = company.founders || [];
 
   return (
     <div className="space-y-7">
@@ -130,6 +137,20 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                 </a>
               )}
             </div>
+            {founders.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {founders.map((founder) => (
+                  <Link
+                    key={founder.id}
+                    href={`/founders/${founder.slug}`}
+                    className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-semibold text-zinc-600 hover:text-zinc-950 hover:underline dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-50"
+                  >
+                    <UserRound size={13} />
+                    {founder.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 sm:min-w-72">
@@ -150,6 +171,32 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {founders.length > 0 && (
+        <section className="space-y-3">
+          <div className="border-b border-zinc-100 pb-3 dark:border-zinc-900">
+            <h2 className="font-heading text-lg font-bold text-zinc-950 dark:text-zinc-50">Founders</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Founder profiles attached from structured or domain-backed sources.</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {founders.map((founder) => (
+              <Link
+                key={founder.id}
+                href={`/founders/${founder.slug}`}
+                className="rounded-lg border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-650"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-zinc-950 dark:text-zinc-50">{founder.name}</div>
+                    <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{founder.headline || founder.title || 'Founder'}</div>
+                  </div>
+                  <ArrowUpRight size={14} className="text-zinc-400" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-3 dark:border-zinc-900">

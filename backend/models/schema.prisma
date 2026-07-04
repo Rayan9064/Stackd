@@ -35,7 +35,9 @@ model Company {
   logoUrl         String?
   confidenceScore Float          @default(0.75)
   aliases         CompanyAlias[]
+  domains         CompanyDomain[]
   signals         Signal[]
+  founders        CompanyFounder[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 }
@@ -52,6 +54,18 @@ model CompanyAlias {
   @@index([companyId])
 }
 
+model CompanyDomain {
+  id        String   @id @default(cuid())
+  companyId String
+  domain    String   @unique
+  isPrimary Boolean  @default(false)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
 model Source {
   id          String   @id @default(cuid())
   name        String   @unique
@@ -60,8 +74,30 @@ model Source {
   baseUrl     String?
   reliability Float    @default(0.7)
   signals     Signal[]
+  signalSources SignalSource[]
+  runs        SourceRun[]
+  unresolvedSignals UnresolvedSignal[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model SourceRun {
+  id              String    @id @default(cuid())
+  sourceId        String?
+  sourceKey       String
+  status          String
+  startedAt       DateTime
+  finishedAt      DateTime?
+  itemsFetched    Int       @default(0)
+  itemsInserted   Int       @default(0)
+  itemsDeduped    Int       @default(0)
+  itemsUnresolved Int       @default(0)
+  errorMessage    String?
+  source          Source?   @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@index([sourceKey])
+  @@index([status])
+  @@index([startedAt])
 }
 
 model Signal {
@@ -78,12 +114,96 @@ model Signal {
   externalId   String?
   company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   source       Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  signalSources SignalSource[]
   createdAt    DateTime @default(now())
 
   @@index([companyId])
   @@index([sourceId])
   @@index([type])
   @@index([occurredAt])
+}
+
+model SignalSource {
+  id         String   @id @default(cuid())
+  signalId   String
+  sourceId   String?
+  sourceKey  String
+  externalId String
+  url        String?
+  rawPayload String?
+  signal     Signal   @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  source     Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@unique([sourceKey, externalId])
+  @@index([signalId])
+  @@index([sourceId])
+}
+
+model UnresolvedSignal {
+  id             String   @id @default(cuid())
+  sourceId       String?
+  sourceKey      String
+  externalId     String
+  reason         String
+  companyNameRaw String?
+  companyDomain  String?
+  signalType     String
+  title          String
+  url            String
+  publishedAt    DateTime
+  rawPayload     String?
+  source         Source?  @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([sourceKey, externalId])
+  @@index([sourceKey])
+  @@index([reason])
+}
+
+model Founder {
+  id              String          @id @default(cuid())
+  name            String
+  slug            String          @unique
+  headline        String?
+  geography       String?
+  linkedinUrl     String?         @unique
+  xUrl            String?         @unique
+  website         String?         @unique
+  confidenceScore Float           @default(0.75)
+  aliases         FounderAlias[]
+  companies       CompanyFounder[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model FounderAlias {
+  id              String   @id @default(cuid())
+  founderId       String
+  alias           String
+  normalizedAlias String   @unique
+  founder         Founder  @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+
+  @@index([founderId])
+}
+
+model CompanyFounder {
+  id        String   @id @default(cuid())
+  companyId String
+  founderId String
+  role      String?
+  title     String?
+  sourceKey String?
+  sourceUrl String?
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  founder   Founder  @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([companyId, founderId])
+  @@index([companyId])
+  @@index([founderId])
 }
 
 model Launch {

@@ -51,7 +51,7 @@ async def global_search(
         for company in companies:
             signal_count, sources = await signal_stats(company.id)
             if is_publishable_company(company, signal_count, sources):
-                company_results.append(company_to_dict(company, signal_count, sources))
+                company_results.append(await company_to_dict(company, signal_count, sources))
             if len(company_results) >= 20:
                 break
         results["companies"] = company_results
