@@ -87,6 +87,8 @@ Set these on Render for the backend service:
 PYTHON_VERSION="3.11.9"
 DATABASE_URL="postgresql://USER:PASSWORD@HOST/neondb?sslmode=require"
 CORS_ORIGINS="https://stackd-startups.vercel.app,http://localhost:3000,http://127.0.0.1:3000"
+AUTO_REFRESH_ON_STARTUP="true"
+AUTO_REFRESH_COOLDOWN_HOURS="12"
 RESEND_API_KEY=""
 RESEND_FROM_EMAIL="digest@example.com"
 PH_API_KEY=""
@@ -102,6 +104,8 @@ Notes:
 - `RESEND_API_KEY` is only required for sending digest emails.
 - Product Hunt, Reddit, and GitHub tokens are optional. Missing optional keys should not crash the app.
 - `GITHUB_TOKEN` is recommended for higher GitHub API rate limits.
+- `AUTO_REFRESH_ON_STARTUP=true` runs source ingestion after backend boot unless the latest source run is inside the cooldown window.
+- `AUTO_REFRESH_COOLDOWN_HOURS=12` prevents free-tier restarts from repeatedly hitting external APIs.
 - If Prisma has trouble with Neon, use `sslmode=require` and omit `channel_binding=require`.
 
 ### Frontend
@@ -141,8 +145,10 @@ After deploy:
 
 ```powershell
 Invoke-RestMethod https://stackd-backend-4cb7.onrender.com/health
-Invoke-RestMethod -Method Post https://stackd-backend-4cb7.onrender.com/api/admin/refresh
 ```
+
+The backend starts a background refresh automatically after boot when `AUTO_REFRESH_ON_STARTUP=true`.
+Use `POST /api/admin/refresh` only when you want to force a demo refresh outside the cooldown window.
 
 ### Frontend on Vercel
 
@@ -188,7 +194,7 @@ Important routes:
 - Jobs: every 24 hours.
 - Weekly digest: Sunday 09:00 UTC.
 
-On Render free tier, APScheduler only runs while the backend service is awake. Use `POST /api/admin/refresh` after deploys or before demos.
+On Render free tier, APScheduler only runs while the backend service is awake. Startup refresh covers normal redeploys, while `POST /api/admin/refresh` is still available for manual demo refreshes.
 
 ## Adding Data
 
@@ -197,8 +203,15 @@ Community-maintained JSON files live in `data/`.
 - Add accelerators to `data/cohorts.json`.
 - Add investors to `data/investors.json`.
 - Add startup profiles to `data/startups.json`.
+- Add source-backed startup enrichment to `data/startup_enrichment.json`.
 
 Always include a `sourceUrl`.
+
+Current startup profile data comes from:
+
+- `data/startups.json`: curated startup directory, official website, geography, sector, stage, and one-line profile.
+- `data/startup_enrichment.json`: manually curated source-backed social links, funding rounds, profile sources, and ownership/shareholder slices where public percentages exist.
+- Adapter-backed graph evidence: Product Hunt, Hacker News, GitHub, jobs, news/RSS, Reddit, and local directory records attach signals to curated startups only when matching is safe.
 
 ## Verification
 

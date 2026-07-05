@@ -1,7 +1,8 @@
 import logging
 import sys
 import os
-from datetime import datetime, timezone
+import asyncio
+from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
@@ -28,12 +29,36 @@ from backend.routes.digest import router as digest_router
 from backend.routes.funding import router as funding_router
 from backend.routes.github import router as github_router
 from backend.routes.search import router as search_router
-from backend.routes.admin import router as admin_router
+from backend.routes.admin import router as admin_router, refresh_all_sources
 from backend.routes.companies import router as companies_router
 from backend.routes.founders import router as founders_router
 
 logger = logging.getLogger("main")
 logging.basicConfig(level=logging.INFO)
+
+
+async def maybe_refresh_on_startup():
+    enabled = os.environ.get("AUTO_REFRESH_ON_STARTUP", "true").lower() in {"1", "true", "yes"}
+    if not enabled:
+        logger.info("Startup refresh disabled by AUTO_REFRESH_ON_STARTUP.")
+        return
+
+    cooldown_hours = int(os.environ.get("AUTO_REFRESH_COOLDOWN_HOURS", "12"))
+    try:
+        latest_run = await db.sourcerun.find_first(order={"startedAt": "desc"})
+        if latest_run and latest_run.startedAt:
+            latest_started_at = latest_run.startedAt
+            if latest_started_at.tzinfo is None:
+                latest_started_at = latest_started_at.replace(tzinfo=timezone.utc)
+            if datetime.now(timezone.utc) - latest_started_at < timedelta(hours=cooldown_hours):
+                logger.info("Skipping startup refresh; latest source run is inside cooldown window.")
+                return
+
+        logger.info("Running startup refresh in background...")
+        await refresh_all_sources()
+        logger.info("Startup refresh completed.")
+    except Exception as exc:
+        logger.exception("Startup refresh failed: %s", exc)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -54,6 +79,8 @@ async def lifespan(app: FastAPI):
         logger.info("Scheduler started successfully.")
     except Exception as e:
         logger.error(f"Failed to start scheduler at startup: {e}")
+
+    asyncio.create_task(maybe_refresh_on_startup())
         
     yield
     
