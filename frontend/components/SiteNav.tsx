@@ -11,6 +11,7 @@ const navItems = [
   { href: '/jobs', label: 'Jobs' },
   { href: '/investors', label: 'Investors' },
   { href: '/startups', label: 'Startups' },
+  { href: '/founders', label: 'Founders' },
 ];
 
 function isActive(pathname: string, href: string) {
