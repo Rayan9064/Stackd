@@ -1,0 +1,189 @@
+{
+  "comment": "Source-backed enrichment for curated startup profiles. Do not add inferred ownership percentages without a public source.",
+  "startups": {
+    "stripe": {
+      "socialLinks": {
+        "linkedin": "https://www.linkedin.com/company/stripe",
+        "x": "https://x.com/stripe",
+        "github": "https://github.com/stripe"
+      },
+      "profileSources": [
+        {
+          "label": "Official website",
+          "type": "official",
+          "url": "https://stripe.com"
+        },
+        {
+          "label": "Stripe newsroom",
+          "type": "official",
+          "url": "https://stripe.com/newsroom"
+        }
+      ],
+      "fundingRounds": [
+        {
+          "round": "Series I",
+          "amount": "$6.5B+",
+          "valuation": "$50B",
+          "announcedAt": "2023-03-15",
+          "investors": [
+            "Andreessen Horowitz",
+            "Baillie Gifford",
+            "Founders Fund",
+            "General Catalyst",
+            "GIC",
+            "Goldman Sachs Asset and Wealth Management",
+            "MSD Partners",
+            "Temasek",
+            "Thrive Capital"
+          ],
+          "sourceName": "Stripe Newsroom",
+          "sourceUrl": "https://stripe.com/newsroom/news/stripe-series-i-employee-liquidity"
+        }
+      ],
+      "ownership": {
+        "status": "unavailable",
+        "note": "Stripe is private; a verified cap table or ownership percentage source has not been added yet.",
+        "asOf": "2026-07-05",
+        "shareholders": []
+      }
+    },
+    "openai": {
+      "socialLinks": {
+        "linkedin": "https://www.linkedin.com/company/openai",
+        "x": "https://x.com/openai",
+        "github": "https://github.com/openai"
+      },
+      "profileSources": [
+        {
+          "label": "Official website",
+          "type": "official",
+          "url": "https://openai.com"
+        },
+        {
+          "label": "OpenAI news",
+          "type": "official",
+          "url": "https://openai.com/news/"
+        }
+      ],
+      "fundingRounds": [
+        {
+          "round": "Strategic investment",
+          "amount": "Multibillion dollar",
+          "announcedAt": "2023-01-23",
+          "investors": [
+            "Microsoft"
+          ],
+          "sourceName": "Microsoft Blog",
+          "sourceUrl": "https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/"
+        }
+      ],
+      "ownership": {
+        "status": "partial",
+        "note": "Only publicly disclosed ownership context is shown. Remaining ownership is grouped until more source-backed detail is available.",
+        "asOf": "2025-10-28",
+        "shareholders": [
+          {
+            "name": "Microsoft",
+            "percentage": 27,
+            "sourceName": "Microsoft Blog",
+            "sourceUrl": "https://blogs.microsoft.com/blog/2025/10/28/the-next-chapter-of-the-microsoft-openai-partnership/"
+          },
+          {
+            "name": "Other owners",
+            "percentage": 73,
+            "sourceName": "Microsoft Blog",
+            "sourceUrl": "https://blogs.microsoft.com/blog/2025/10/28/the-next-chapter-of-the-microsoft-openai-partnership/"
+          }
+        ]
+      }
+    },
+    "notion": {
+      "socialLinks": {
+        "linkedin": "https://www.linkedin.com/company/notionhq",
+        "x": "https://x.com/NotionHQ"
+      },
+      "profileSources": [
+        {
+          "label": "Official website",
+          "type": "official",
+          "url": "https://www.notion.com"
+        }
+      ],
+      "fundingRounds": [
+        {
+          "round": "Series C",
+          "amount": "$275M",
+          "valuation": "$10B",
+          "announcedAt": "2021-10-08",
+          "investors": [
+            "Coatue",
+            "Sequoia Capital",
+            "Base10 Partners"
+          ],
+          "sourceName": "Forbes",
+          "sourceUrl": "https://www.forbes.com/sites/alexkonrad/2021/10/08/notion-raises-at-10-billion-valuation-boosted-by-remote-work-tiktok/"
+        }
+      ],
+      "ownership": {
+        "status": "unavailable",
+        "note": "Notion is private; verified shareholder percentages have not been added yet.",
+        "asOf": "2026-07-05",
+        "shareholders": []
+      }
+    },
+    "revolut": {
+      "socialLinks": {
+        "linkedin": "https://www.linkedin.com/company/revolut",
+        "x": "https://x.com/RevolutApp"
+      },
+      "profileSources": [
+        {
+          "label": "Official website",
+          "type": "official",
+          "url": "https://www.revolut.com"
+        },
+        {
+          "label": "Revolut news",
+          "type": "official",
+          "url": "https://www.revolut.com/news/"
+        }
+      ],
+      "fundingRounds": [
+        {
+          "round": "Series E",
+          "amount": "$800M",
+          "valuation": "$33B",
+          "announcedAt": "2021-07-15",
+          "investors": [
+            "SoftBank Vision Fund 2",
+            "Tiger Global Management"
+          ],
+          "sourceName": "Revolut News",
+          "sourceUrl": "https://www.revolut.com/en-US/news/revolut_raises_800m_series_e_funding_from_softbank_vision_fund_2_and_tiger_global/"
+        },
+        {
+          "round": "Secondary share sale",
+          "valuation": "$75B",
+          "announcedAt": "2025-12-01",
+          "investors": [
+            "Coatue",
+            "Greenoaks",
+            "Dragoneer",
+            "Fidelity Management & Research Company",
+            "Andreessen Horowitz",
+            "Franklin Templeton",
+            "T. Rowe Price"
+          ],
+          "sourceName": "Revolut News",
+          "sourceUrl": "https://www.revolut.com/en-US/news/revolut_completes_fundraising_process_establishing_75_billion_valuation/"
+        }
+      ],
+      "ownership": {
+        "status": "unavailable",
+        "note": "Revolut is private; investor participation is sourced, but ownership percentages are not.",
+        "asOf": "2026-07-05",
+        "shareholders": []
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Startup } from '@/lib/api';
@@ -26,9 +27,9 @@ export default function StartupCard({ startup }: StartupCardProps) {
               <GeoBadge geo={startup.geography} />
             </div>
             <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 mt-1 hover:underline">
-              <a href={startup.website} target="_blank" rel="noopener noreferrer">
+              <Link href={`/startups/${startup.id}`}>
                 {startup.name}
-              </a>
+              </Link>
             </CardTitle>
             <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
               <MapPin size={11} className="text-zinc-400" />

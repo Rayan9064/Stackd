@@ -32,6 +32,15 @@ def test_all_endpoints_sequentially():
         assert res_startups.status_code == 200
         assert "data" in res_startups.json()
         assert "total" in res_startups.json()
+        assert "profileSources" in res_startups.json()["data"][0]
+
+        res_startup = client.get("/api/startups/stripe")
+        assert res_startup.status_code == 200
+        startup = res_startup.json()
+        assert startup["id"] == "stripe"
+        assert startup["socialLinks"]["linkedin"]
+        assert startup["fundingRounds"][0]["sourceUrl"]
+        assert startup["ownership"]["status"] in ["available", "partial", "unavailable"]
         
         # 6. Cohorts API
         res_cohorts = client.get("/api/cohorts")

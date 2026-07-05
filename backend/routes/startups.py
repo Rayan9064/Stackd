@@ -1,6 +1,6 @@
 import os
 import json
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from typing import Optional, List
 
 from backend.db import db, ensure_db_connected
@@ -19,6 +19,11 @@ def read_json_data(filename: str):
         
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+
+def read_startup_enrichment():
+    data = read_json_data("startup_enrichment.json") or {}
+    return data.get("startups", {})
 
 
 def empty_graph_metadata():
@@ -89,6 +94,43 @@ async def safe_startup_graph_metadata(startup: dict):
     except Exception:
         return empty_graph_metadata()
 
+
+def default_enrichment(startup: dict):
+    return {
+        "socialLinks": {},
+        "profileSources": [
+            {
+                "label": "Official website",
+                "type": "official",
+                "url": startup.get("website"),
+            }
+        ] if startup.get("website") else [],
+        "fundingRounds": [],
+        "ownership": {
+            "status": "unavailable",
+            "note": "No source-backed ownership percentages have been added yet.",
+            "asOf": None,
+            "shareholders": [],
+        },
+    }
+
+
+def merge_startup_enrichment(startup: dict, enrichment_map: dict):
+    enrichment = enrichment_map.get(startup.get("id"), {})
+    base = default_enrichment(startup)
+    merged = {
+        **base,
+        **enrichment,
+    }
+    if not merged.get("profileSources"):
+        merged["profileSources"] = base["profileSources"]
+    if not merged.get("ownership"):
+        merged["ownership"] = base["ownership"]
+    return {
+        **startup,
+        **merged,
+    }
+
 @router.get("/api/startups")
 async def get_startups(
     page: int = Query(1, ge=1),
@@ -100,6 +142,7 @@ async def get_startups(
 ):
     data_dict = read_json_data("startups.json")
     startups = data_dict.get("startups", []) if data_dict else []
+    enrichment_map = read_startup_enrichment()
     
     filtered = startups
     if sector:
@@ -126,9 +169,10 @@ async def get_startups(
     
     data = []
     for s in paginated:
+        enriched = merge_startup_enrichment(s, enrichment_map)
         graph_metadata = await safe_startup_graph_metadata(s)
         data.append({
-            **s,
+            **enriched,
             "sourceUrl": s.get("website"),
             **graph_metadata,
         })
@@ -139,6 +183,24 @@ async def get_startups(
         "page": page,
         "limit": limit,
         "hasMore": offset + len(data) < len(filtered)
+    }
+
+
+@router.get("/api/startups/{startup_id}")
+async def get_startup(startup_id: str):
+    data_dict = read_json_data("startups.json")
+    startups = data_dict.get("startups", []) if data_dict else []
+    startup = next((item for item in startups if item.get("id") == startup_id), None)
+    if not startup:
+        raise HTTPException(status_code=404, detail="Startup not found")
+
+    enrichment_map = read_startup_enrichment()
+    enriched = merge_startup_enrichment(startup, enrichment_map)
+    graph_metadata = await safe_startup_graph_metadata(startup)
+    return {
+        **enriched,
+        "sourceUrl": startup.get("website"),
+        **graph_metadata,
     }
 
 @router.get("/api/cohorts")

@@ -90,6 +90,37 @@ export interface Startup {
   fundingTotal: string;
   website: string;
   sourceUrl: string;
+  socialLinks?: {
+    linkedin?: string;
+    x?: string;
+    github?: string;
+    crunchbase?: string;
+  };
+  profileSources?: Array<{
+    label: string;
+    type: string;
+    url: string;
+  }>;
+  fundingRounds?: Array<{
+    round: string;
+    amount?: string;
+    valuation?: string;
+    announcedAt?: string;
+    investors?: string[];
+    sourceName: string;
+    sourceUrl: string;
+  }>;
+  ownership?: {
+    status: 'available' | 'partial' | 'unavailable';
+    note?: string;
+    asOf?: string | null;
+    shareholders?: Array<{
+      name: string;
+      percentage: number;
+      sourceName?: string;
+      sourceUrl?: string;
+    }>;
+  };
   graphSlug?: string | null;
   signalCount?: number;
   sourceCount?: number;
@@ -279,6 +310,11 @@ export const api = {
     if (params.search) query.append('search', params.search);
     
     return fetchAPI<PaginatedResponse<Startup>>(`/api/startups?${query.toString()}`);
+  },
+
+  // GET /api/startups/:id
+  async getStartup(id: string): Promise<Startup> {
+    return fetchAPI<Startup>(`/api/startups/${id}`);
   },
 
   // GET /api/founders
