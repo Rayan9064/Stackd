@@ -3,6 +3,10 @@ import json
 from fastapi import APIRouter, Query
 from typing import Optional, List
 
+from backend.db import db, ensure_db_connected
+from backend.routes.companies import founder_links, signal_stats
+from backend.services.entity_resolver import extract_domain, normalize_name
+
 router = APIRouter(tags=["startups-cohorts-investors"])
 
 # Helper to read JSON data files
@@ -15,6 +19,75 @@ def read_json_data(filename: str):
         
     with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+
+def empty_graph_metadata():
+    return {
+        "graphSlug": None,
+        "signalCount": 0,
+        "sourceCount": 0,
+        "sources": [],
+        "founders": [],
+        "domains": [],
+    }
+
+
+async def find_company_for_startup(startup: dict):
+    domain = extract_domain(startup.get("website"))
+    if domain:
+        company_domain = await db.companydomain.find_unique(where={"domain": domain})
+        if company_domain:
+            return await db.company.find_unique(where={"id": company_domain.companyId})
+
+        alias = await db.companyalias.find_unique(where={"domain": domain})
+        if alias:
+            return await db.company.find_unique(where={"id": alias.companyId})
+
+        company = await db.company.find_first(where={"website": {"contains": domain}})
+        if company:
+            return company
+
+    normalized_name = normalize_name(startup.get("name", ""))
+    if normalized_name:
+        alias = await db.companyalias.find_unique(where={"normalizedAlias": normalized_name})
+        if alias:
+            return await db.company.find_unique(where={"id": alias.companyId})
+
+    slug = startup.get("id")
+    if slug:
+        return await db.company.find_unique(where={"slug": slug})
+    return None
+
+
+async def startup_graph_metadata(startup: dict):
+    company = await find_company_for_startup(startup)
+    if not company:
+        return empty_graph_metadata()
+
+    signal_count, sources = await signal_stats(company.id)
+    domains = await db.companydomain.find_many(where={"companyId": company.id})
+    return {
+        "graphSlug": company.slug,
+        "signalCount": signal_count,
+        "sourceCount": len(sources),
+        "sources": sources,
+        "founders": await founder_links(company.id),
+        "domains": [
+            {
+                "domain": domain.domain,
+                "isPrimary": domain.isPrimary,
+            }
+            for domain in domains
+        ],
+    }
+
+
+async def safe_startup_graph_metadata(startup: dict):
+    try:
+        await ensure_db_connected()
+        return await startup_graph_metadata(startup)
+    except Exception:
+        return empty_graph_metadata()
 
 @router.get("/api/startups")
 async def get_startups(
@@ -53,9 +126,11 @@ async def get_startups(
     
     data = []
     for s in paginated:
+        graph_metadata = await safe_startup_graph_metadata(s)
         data.append({
             **s,
-            "sourceUrl": s.get("website")
+            "sourceUrl": s.get("website"),
+            **graph_metadata,
         })
         
     return {
